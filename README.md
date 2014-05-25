@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/cocoapods/l/ZFDragableModalTransition.svg?style=flat)](http://cocoadocs.org/docsets/ZFDragableModalTransition)
 [![Platform](https://img.shields.io/cocoapods/p/ZFDragableModalTransition.svg?style=flat)](http://cocoadocs.org/docsets/ZFDragableModalTransition)
 
-<p align="center"><img src="https://raw.github.com/zoonooz/ZFDragableModalTransition/master/Screenshot/ss.gif"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/zoonooz/ZFDragableModalTransition/master/Screenshot/ss.gif"/></p>
 
 ## Usage
 
