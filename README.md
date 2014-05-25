@@ -8,12 +8,6 @@
 
 ## Usage
 
-To run the example project; clone the repo, and run `pod install` from the Example directory first.
-
-## Requirements
-
-## Installation
-
 ```objc
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
@@ -30,6 +24,15 @@ To run the example project; clone the repo, and run `pod install` from the Examp
     detailViewController.modalPresentationStyle = UIModalPresentationCustom;
 }
 ```
+
+## Requirements
+
+## Installation
+
+ZFDragableModalTransition is available through [CocoaPods](http://cocoapods.org). To install
+it, simply add the following line to your Podfile:
+
+    pod "ZFDragableModalTransition"
 
 ## Author
 
