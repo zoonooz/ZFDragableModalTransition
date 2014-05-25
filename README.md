@@ -14,10 +14,22 @@ To run the example project; clone the repo, and run `pod install` from the Examp
 
 ## Installation
 
-ZFDragableModalTransition is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-    pod "ZFDragableModalTransition"
+```objc
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    TaskDetailViewController *detailViewController = segue.destinationViewController;
+    detailViewController.task = sender;
+    
+    // set here
+    ZFModalTransitionAnimator *animator = [[ZFModalTransitionAnimator alloc] initWithModalViewController:detailViewController];
+    animator.dragable = YES;
+    animator.direction = ZFModalTransitonDirectionRight;
+    [animator setContentScrollView:detailViewController.scrollview];
+    
+    detailViewController.transitioningDelegate = self.animator;
+    detailViewController.modalPresentationStyle = UIModalPresentationCustom;
+}
+```
 
 ## Author
 
