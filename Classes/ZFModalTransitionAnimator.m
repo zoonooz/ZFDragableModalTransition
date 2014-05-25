@@ -1,19 +1,17 @@
 //
 //  ZFModalTransitionAnimator.m
-//  todaytask
 //
 //  Created by Amornchai Kanokpullwad on 5/10/14.
 //  Copyright (c) 2014 zoonref. All rights reserved.
 //
 
 #import "ZFModalTransitionAnimator.h"
-#import "ZFCustomGestureRecognizer.h"
 
 @interface ZFModalTransitionAnimator ()
 @property (nonatomic, strong) UIViewController *modalController;
-@property (nonatomic, strong) ZFCustomGestureRecognizer *gesture;
+@property (nonatomic, strong) ZFDetectScrollViewEndGestureRecognizer *gesture;
 @property (nonatomic, strong) id<UIViewControllerContextTransitioning> transitionContext;
-@property CGFloat panLocationStartY;
+@property CGFloat panLocationStart;
 @property BOOL isDismiss;
 @property BOOL isInteractive;
 @end
@@ -25,6 +23,7 @@
     self = [super init];
     if (self) {
         _modalController = modalViewController;
+        _direction = ZFModalTransitonDirectionBottom;
         _dragable = NO;
     }
     return self;
@@ -34,7 +33,7 @@
 {
     _dragable = dragable;
     if (self.isDragable) {
-        self.gesture = [[ZFCustomGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+        self.gesture = [[ZFDetectScrollViewEndGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
         self.gesture.delegate = self;
         [self.modalController.view addGestureRecognizer:self.gesture];
     }
@@ -69,10 +68,27 @@
     [[transitionContext containerView] addSubview:toViewController.view];
     
     if (!self.isDismiss) {
-        toViewController.view.frame = CGRectMake(0,
-                                                 CGRectGetHeight(toViewController.view.frame),
-                                                 CGRectGetWidth(toViewController.view.frame),
-                                                 CGRectGetHeight(toViewController.view.frame));
+        
+        CGRect startRect;
+        
+        if (self.direction == ZFModalTransitonDirectionBottom) {
+            startRect = CGRectMake(0,
+                                   CGRectGetHeight(toViewController.view.frame),
+                                   CGRectGetWidth(toViewController.view.frame),
+                                   CGRectGetHeight(toViewController.view.frame));
+        } else if (self.direction == ZFModalTransitonDirectionLeft) {
+            startRect = CGRectMake(-CGRectGetWidth(toViewController.view.frame),
+                                   0,
+                                   CGRectGetWidth(toViewController.view.frame),
+                                   CGRectGetHeight(toViewController.view.frame));
+        } else if (self.direction == ZFModalTransitonDirectionRight) {
+            startRect = CGRectMake(CGRectGetWidth(toViewController.view.frame),
+                                   0,
+                                   CGRectGetWidth(toViewController.view.frame),
+                                   CGRectGetHeight(toViewController.view.frame));
+        }
+        
+        toViewController.view.frame = startRect;
         
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
@@ -97,6 +113,25 @@
         [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
         toViewController.view.layer.transform = CATransform3DMakeScale(0.9, 0.9, 1);
         
+        CGRect endRect;
+        
+        if (self.direction == ZFModalTransitonDirectionBottom) {
+            endRect = CGRectMake(0,
+                                 CGRectGetHeight(fromViewController.view.frame),
+                                 CGRectGetWidth(fromViewController.view.frame),
+                                 CGRectGetHeight(fromViewController.view.frame));
+        } else if (self.direction == ZFModalTransitonDirectionLeft) {
+            endRect = CGRectMake(-CGRectGetWidth(fromViewController.view.frame),
+                                 0,
+                                 CGRectGetWidth(fromViewController.view.frame),
+                                 CGRectGetHeight(fromViewController.view.frame));
+        } else if (self.direction == ZFModalTransitonDirectionRight) {
+            endRect = CGRectMake(CGRectGetWidth(fromViewController.view.frame),
+                                 0,
+                                 CGRectGetWidth(fromViewController.view.frame),
+                                 CGRectGetHeight(fromViewController.view.frame));
+        }
+        
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
              usingSpringWithDamping:5
@@ -104,10 +139,7 @@
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
                              toViewController.view.layer.transform = CATransform3DIdentity;
-                             fromViewController.view.frame = CGRectMake(0,
-                                                                        CGRectGetHeight(fromViewController.view.frame),
-                                                                        CGRectGetWidth(fromViewController.view.frame),
-                                                                        CGRectGetHeight(fromViewController.view.frame));
+                             fromViewController.view.frame = endRect;
                          } completion:^(BOOL finished) {
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
                              
@@ -127,17 +159,41 @@
     
     if (recognizer.state == UIGestureRecognizerStateBegan) {
         self.isInteractive = YES;
-        self.panLocationStartY = location.y;
+        if (self.direction == ZFModalTransitonDirectionBottom) {
+            self.panLocationStart = location.y;
+        } else {
+            self.panLocationStart = location.x;
+        }
         [self.modalController dismissViewControllerAnimated:YES completion:nil];
     }
     
     else if (recognizer.state == UIGestureRecognizerStateChanged) {
-        CGFloat animationRatio = (location.y - self.panLocationStartY) / (CGRectGetHeight([self.modalController view].bounds));
+        CGFloat animationRatio;
+        
+        if (self.direction == ZFModalTransitonDirectionBottom) {
+            animationRatio = (location.y - self.panLocationStart) / (CGRectGetHeight([self.modalController view].bounds));
+        } else if (self.direction == ZFModalTransitonDirectionLeft) {
+            animationRatio = (self.panLocationStart - location.x) / (CGRectGetWidth([self.modalController view].bounds));
+        } else if (self.direction == ZFModalTransitonDirectionRight) {
+            animationRatio = (location.x - self.panLocationStart) / (CGRectGetWidth([self.modalController view].bounds));
+        }
         
         [self updateInteractiveTransition:animationRatio];
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
-        NSLog(@"%f",velocity.y);
-        if (velocity.y > 100) {
+        
+        CGFloat velocityForSelectedDirection;
+        
+        if (self.direction == ZFModalTransitonDirectionBottom) {
+            velocityForSelectedDirection = velocity.y;
+        } else {
+            velocityForSelectedDirection = velocity.x;
+        }
+        
+        if (velocityForSelectedDirection > 100
+            && (self.direction == ZFModalTransitonDirectionRight
+            || self.direction == ZFModalTransitonDirectionBottom)) {
+            [self finishInteractiveTransition];
+        } else if (velocityForSelectedDirection < -100 && self.direction == ZFModalTransitonDirectionLeft) {
             [self finishInteractiveTransition];
         } else {
             [self cancelInteractiveTransition];
@@ -168,10 +224,24 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     toViewController.view.layer.transform = CATransform3DMakeScale(0.9 + (0.1 * percentComplete), 0.9 + (0.1 * percentComplete), 1);
-    fromViewController.view.frame = CGRectMake(0,
-                                               (CGRectGetHeight(fromViewController.view.frame) * percentComplete),
-                                               CGRectGetWidth(fromViewController.view.frame),
-                                               CGRectGetHeight(fromViewController.view.frame));
+    
+    if (self.direction == ZFModalTransitonDirectionBottom) {
+        fromViewController.view.frame = CGRectMake(0,
+                                                   (CGRectGetHeight(fromViewController.view.frame) * percentComplete),
+                                                   CGRectGetWidth(fromViewController.view.frame),
+                                                   CGRectGetHeight(fromViewController.view.frame));
+    } else if (self.direction == ZFModalTransitonDirectionLeft) {
+        fromViewController.view.frame = CGRectMake(-(CGRectGetWidth(fromViewController.view.frame) * percentComplete),
+                                                   0,
+                                                   CGRectGetWidth(fromViewController.view.frame),
+                                                   CGRectGetHeight(fromViewController.view.frame));
+    } else if (self.direction == ZFModalTransitonDirectionRight) {
+        fromViewController.view.frame = CGRectMake(CGRectGetWidth(fromViewController.view.frame) * percentComplete,
+                                                   0,
+                                                   CGRectGetWidth(fromViewController.view.frame),
+                                                   CGRectGetHeight(fromViewController.view.frame));
+    }
+
 }
 
 - (void)finishInteractiveTransition
@@ -181,6 +251,25 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
+    CGRect endRect;
+    
+    if (self.direction == ZFModalTransitonDirectionBottom) {
+        endRect = CGRectMake(0,
+                             CGRectGetHeight(fromViewController.view.frame),
+                             CGRectGetWidth(fromViewController.view.frame),
+                             CGRectGetHeight(fromViewController.view.frame));
+    } else if (self.direction == ZFModalTransitonDirectionLeft) {
+        endRect = CGRectMake(-CGRectGetWidth(fromViewController.view.frame),
+                             0,
+                             CGRectGetWidth(fromViewController.view.frame),
+                             CGRectGetHeight(fromViewController.view.frame));
+    } else if (self.direction == ZFModalTransitonDirectionRight) {
+        endRect = CGRectMake(CGRectGetWidth(fromViewController.view.frame),
+                             0,
+                             CGRectGetWidth(fromViewController.view.frame),
+                             CGRectGetHeight(fromViewController.view.frame));
+    }
+    
     [UIView animateWithDuration:[self transitionDuration:transitionContext]
                           delay:0
          usingSpringWithDamping:5
@@ -188,10 +277,7 @@
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          toViewController.view.layer.transform = CATransform3DIdentity;
-                         fromViewController.view.frame = CGRectMake(0,
-                                                                    CGRectGetHeight(fromViewController.view.frame),
-                                                                    CGRectGetWidth(fromViewController.view.frame),
-                                                                    CGRectGetHeight(fromViewController.view.frame));
+                         fromViewController.view.frame = endRect;
                      } completion:^(BOOL finished) {
                          [transitionContext completeTransition:YES];
                          self.modalController = nil;
@@ -260,12 +346,62 @@
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
-    return YES;
+    if (self.direction == ZFModalTransitonDirectionBottom) {
+        return YES;
+    }
+    return NO;
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
-    return YES;
+    if (self.direction == ZFModalTransitonDirectionBottom) {
+        return YES;
+    }
+    return NO;
+}
+
+@end
+
+// Gesture Class Implement
+@interface ZFDetectScrollViewEndGestureRecognizer ()
+@property (nonatomic, strong) NSNumber *isFail;
+@end
+
+@implementation ZFDetectScrollViewEndGestureRecognizer
+
+- (void)reset
+{
+    [super reset];
+    self.isFail = nil;
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesMoved:touches withEvent:event];
+    
+    if (!self.scrollview) {
+        return;
+    }
+    
+    if (self.state == UIGestureRecognizerStateFailed) return;
+    CGPoint nowPoint = [touches.anyObject locationInView:self.view];
+    CGPoint prevPoint = [touches.anyObject previousLocationInView:self.view];
+    
+    if (self.isFail) {
+        if (self.isFail.boolValue) {
+            self.state = UIGestureRecognizerStateFailed;
+        }
+        return;
+    }
+    
+    if (nowPoint.y > prevPoint.y && self.scrollview.contentOffset.y <= 0) {
+        self.isFail = @NO;
+    } else if (self.scrollview.contentOffset.y >= 0) {
+        self.state = UIGestureRecognizerStateFailed;
+        self.isFail = @YES;
+    } else {
+        self.isFail = @NO;
+    }
+    
 }
 
 @end
