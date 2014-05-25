@@ -17,15 +17,17 @@
     // set here
     ZFModalTransitionAnimator *animator = [[ZFModalTransitionAnimator alloc] initWithModalViewController:detailViewController];
     animator.dragable = YES;
-    animator.direction = ZFModalTransitonDirectionRight;
+    animator.direction = ZFModalTransitonDirectionBottom;
     [animator setContentScrollView:detailViewController.scrollview];
     
-    detailViewController.transitioningDelegate = self.animator;
+    detailViewController.transitioningDelegate = animator;
     detailViewController.modalPresentationStyle = UIModalPresentationCustom;
 }
 ```
 
 ## Requirements
+- iOS >= 7.0
+- ARC
 
 ## Installation
 
