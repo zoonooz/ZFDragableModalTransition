@@ -15,26 +15,27 @@
     detailViewController.task = sender;
     
     // create animator object with instance of modal view controller
-    ZFModalTransitionAnimator *animator = [[ZFModalTransitionAnimator alloc] initWithModalViewController:detailViewController];
-    animator.dragable = YES;
-    animator.direction = ZFModalTransitonDirectionBottom;
-    [animator setContentScrollView:detailViewController.scrollview];
+    // we need to keep it in property with strong reference so it will not get release
+    self.animator = [[ZFModalTransitionAnimator alloc] initWithModalViewController:detailViewController];
+    self.animator.dragable = YES;
+    self.animator.direction = ZFModalTransitonDirectionBottom;
+    [self.animator setContentScrollView:detailViewController.scrollview];
     
     // set transition delegate of modal view controller to our object
-    detailViewController.transitioningDelegate = animator;
+    detailViewController.transitioningDelegate = self.animator;
     detailViewController.modalPresentationStyle = UIModalPresentationCustom;
 }
 ```
 ###ScrollView
 If you have scrollview in the modal and you want to dismiss modal by drag it, you need to set scrollview to ZFModalTransitionAnimator instance.
 ```objc
-[animator setContentScrollView:detailViewController.scrollview];
+[self.animator setContentScrollView:detailViewController.scrollview];
 ```
 
 ###Direction
 You can set that which direction will our modal present. (default is ZFModalTransitonDirectionBottom)
 ```objc
-animator.direction = ZFModalTransitonDirectionBottom;
+self.animator.direction = ZFModalTransitonDirectionBottom;
 ```
 P.S. Now you can set content scrollview only with ZFModalTransitonDirectionBottom
 
