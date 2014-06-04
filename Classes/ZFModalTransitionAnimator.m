@@ -66,11 +66,11 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
-    [[transitionContext containerView] addSubview:toViewController.view];
     
     if (!self.isDismiss) {
         
         CGRect startRect;
+        [[transitionContext containerView] addSubview:toViewController.view];
         
         if (self.direction == ZFModalTransitonDirectionBottom) {
             startRect = CGRectMake(0,
@@ -169,7 +169,7 @@
     }
     
     else if (recognizer.state == UIGestureRecognizerStateChanged) {
-        CGFloat animationRatio;
+        CGFloat animationRatio = 0;
         
         if (self.direction == ZFModalTransitonDirectionBottom) {
             animationRatio = (location.y - self.panLocationStart) / (CGRectGetHeight([self.modalController view].bounds));
@@ -192,18 +192,18 @@
         
         if (velocityForSelectedDirection > 100
             && (self.direction == ZFModalTransitonDirectionRight
-            || self.direction == ZFModalTransitonDirectionBottom)) {
-            [self finishInteractiveTransition];
-        } else if (velocityForSelectedDirection < -100 && self.direction == ZFModalTransitonDirectionLeft) {
-            [self finishInteractiveTransition];
-        } else {
-            [self cancelInteractiveTransition];
-        }
-
+                || self.direction == ZFModalTransitonDirectionBottom)) {
+                [self finishInteractiveTransition];
+            } else if (velocityForSelectedDirection < -100 && self.direction == ZFModalTransitonDirectionLeft) {
+                [self finishInteractiveTransition];
+            } else {
+                [self cancelInteractiveTransition];
+            }
+        
     }
 }
 
-#pragma mark - 
+#pragma mark -
 
 -(void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext
 {
@@ -213,7 +213,6 @@
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
     toViewController.view.layer.transform = CATransform3DMakeScale(self.scaleDownRatio, self.scaleDownRatio, 1);
-    [transitionContext.containerView addSubview:toViewController.view];
     [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
     
 }
@@ -242,7 +241,7 @@
                                                    CGRectGetWidth(fromViewController.view.frame),
                                                    CGRectGetHeight(fromViewController.view.frame));
     }
-
+    
 }
 
 - (void)finishInteractiveTransition
@@ -303,9 +302,9 @@
                          toViewController.view.transform = CGAffineTransformMakeScale(self.scaleDownRatio, self.scaleDownRatio);
                          
                          fromViewController.view.frame = CGRectMake(0,0,
-                                                                  CGRectGetWidth(fromViewController.view.frame),
-                                                                  CGRectGetHeight(fromViewController.view.frame));
-                        
+                                                                    CGRectGetWidth(fromViewController.view.frame),
+                                                                    CGRectGetHeight(fromViewController.view.frame));
+                         
                          
                      } completion:^(BOOL finished) {
                          [transitionContext completeTransition:NO];
@@ -323,12 +322,20 @@
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
 {
     self.isDismiss = YES;
+    
+    // Must return nil in ios8 beta
+    NSComparisonResult order = [[UIDevice currentDevice].systemVersion compare: @"8.0" options: NSNumericSearch];
+    if (order == NSOrderedSame || order == NSOrderedDescending) {
+        // OS version >= 8.0
+        if (self.isInteractive) {
+            return nil;
+        }
+    }
     return self;
 }
 
 - (id <UIViewControllerInteractiveTransitioning>)interactionControllerForPresentation:(id <UIViewControllerAnimatedTransitioning>)animator
 {
-    
     return nil;
 }
 
