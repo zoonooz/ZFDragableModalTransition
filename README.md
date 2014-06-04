@@ -40,7 +40,7 @@ self.animator.direction = ZFModalTransitonDirectionBottom;
 P.S. Now you can set content scrollview only with ZFModalTransitonDirectionBottom
 
 ## Requirements
-- iOS >= 7.0
+- iOS >= 7.0 (tested on ios8 beta)
 - ARC
 
 ## Installation
