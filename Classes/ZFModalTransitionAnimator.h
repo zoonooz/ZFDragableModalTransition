@@ -23,7 +23,8 @@ typedef NS_ENUM(NSUInteger, ZFModalTransitonDirection) {
 
 @property (nonatomic, assign, getter=isDragable) BOOL dragable;
 @property ZFModalTransitonDirection direction;
-@property CGFloat scaleDownRatio;
+@property CGFloat behindViewScale;
+@property CGFloat behindViewAlpha;
 
 - (id)initWithModalViewController:(UIViewController *)modalViewController;
 - (void)setContentScrollView:(UIScrollView *)scrollView;

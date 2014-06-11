@@ -25,7 +25,8 @@
         _modalController = modalViewController;
         _direction = ZFModalTransitonDirectionBottom;
         _dragable = NO;
-        _scaleDownRatio = 0.9f;
+        _behindViewScale = 0.9f;
+        _behindViewAlpha = 1.0f;
     }
     return self;
 }
@@ -98,7 +99,8 @@
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
                              
-                             fromViewController.view.transform = CGAffineTransformMakeScale(self.scaleDownRatio, self.scaleDownRatio);
+                             fromViewController.view.transform = CGAffineTransformMakeScale(self.behindViewScale, self.behindViewScale);
+                             fromViewController.view.alpha = self.behindViewAlpha;
                              
                              toViewController.view.frame = CGRectMake(0,0,
                                                                       CGRectGetWidth(toViewController.view.frame),
@@ -112,7 +114,8 @@
     } else {
         
         [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
-        toViewController.view.layer.transform = CATransform3DMakeScale(self.scaleDownRatio, self.scaleDownRatio, 1);
+        toViewController.view.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1);
+        toViewController.view.alpha = self.behindViewAlpha;
         
         CGRect endRect;
         
@@ -140,6 +143,7 @@
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
                              toViewController.view.layer.transform = CATransform3DIdentity;
+                             toViewController.view.alpha = 1.0f;
                              fromViewController.view.frame = endRect;
                          } completion:^(BOOL finished) {
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -212,7 +216,8 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
-    toViewController.view.layer.transform = CATransform3DMakeScale(self.scaleDownRatio, self.scaleDownRatio, 1);
+    toViewController.view.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1);
+    toViewController.view.alpha = self.behindViewAlpha;
     [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
     
 }
@@ -223,7 +228,10 @@
     
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-    toViewController.view.layer.transform = CATransform3DMakeScale(self.scaleDownRatio + ((1-self.scaleDownRatio) * percentComplete), self.scaleDownRatio + ((1-self.scaleDownRatio) * percentComplete), 1);
+    toViewController.view.layer.transform = CATransform3DMakeScale(
+                                                self.behindViewScale + ((1 - self.behindViewScale) * percentComplete),
+                                                self.behindViewScale + ((1 - self.behindViewScale) * percentComplete), 1);
+    toViewController.view.alpha = self.behindViewAlpha + ((1 - self.behindViewAlpha) * percentComplete);
     
     if (self.direction == ZFModalTransitonDirectionBottom) {
         fromViewController.view.frame = CGRectMake(0,
@@ -277,6 +285,7 @@
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          toViewController.view.layer.transform = CATransform3DIdentity;
+                         toViewController.view.alpha = 1.0f;
                          fromViewController.view.frame = endRect;
                      } completion:^(BOOL finished) {
                          [transitionContext completeTransition:YES];
@@ -299,7 +308,8 @@
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          
-                         toViewController.view.transform = CGAffineTransformMakeScale(self.scaleDownRatio, self.scaleDownRatio);
+                         toViewController.view.transform = CGAffineTransformMakeScale(self.behindViewScale, self.behindViewScale);
+                         toViewController.view.alpha = self.behindViewAlpha;
                          
                          fromViewController.view.frame = CGRectMake(0,0,
                                                                     CGRectGetWidth(fromViewController.view.frame),

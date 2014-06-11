@@ -36,6 +36,8 @@
     
     self.animator = [[ZFModalTransitionAnimator alloc] initWithModalViewController:modalVC];
     self.animator.dragable = self.dragable;
+    self.animator.behindViewAlpha = 0.5f;
+    self.animator.behindViewScale = 0.5f;
     
     NSString *title = [sender titleForState:UIControlStateNormal];
     if ([title isEqualToString:@"Left"]) {
