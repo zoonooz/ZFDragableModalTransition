@@ -74,8 +74,8 @@
         CGRect startRect;
         
         [[transitionContext containerView] addSubview:toViewController.view];
-        toViewController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
         
+        toViewController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
         
         if (self.direction == ZFModalTransitonDirectionBottom) {
             startRect = CGRectMake(0,
@@ -119,7 +119,11 @@
     } else {
         
         [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
-        toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+        
+        if (![self isIOS8]) {
+            toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+        }
+        
         toViewController.view.alpha = self.behindViewAlpha;
         
         CGRect endRect;
@@ -213,7 +217,7 @@
             } else {
                 [self cancelInteractiveTransition];
             }
-        
+        self.isInteractive = NO;
     }
 }
 
@@ -226,7 +230,10 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
-    toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+    if (![self isIOS8]) {
+        toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+    }
+    
     self.tempTransform = toViewController.view.layer.transform;
     
     toViewController.view.alpha = self.behindViewAlpha;
@@ -331,7 +338,7 @@
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          
-                         toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+                         toViewController.view.layer.transform = self.tempTransform;
                          toViewController.view.alpha = self.behindViewAlpha;
                          
                          fromViewController.view.frame = CGRectMake(0,0,
@@ -356,9 +363,7 @@
 {
     self.isDismiss = YES;
     
-    // Must return nil in ios8 beta
-    NSComparisonResult order = [[UIDevice currentDevice].systemVersion compare: @"8.0" options: NSNumericSearch];
-    if (order == NSOrderedSame || order == NSOrderedDescending) {
+    if ([self isIOS8]) {
         // OS version >= 8.0
         if (self.isInteractive) {
             return nil;
@@ -396,6 +401,18 @@
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     if (self.direction == ZFModalTransitonDirectionBottom) {
+        return YES;
+    }
+    return NO;
+}
+
+#pragma mark - Utils
+
+- (BOOL)isIOS8
+{
+    NSComparisonResult order = [[UIDevice currentDevice].systemVersion compare: @"8.0" options: NSNumericSearch];
+    if (order == NSOrderedSame || order == NSOrderedDescending) {
+        // OS version >= 8.0
         return YES;
     }
     return NO;
