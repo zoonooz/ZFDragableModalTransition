@@ -21,6 +21,9 @@
 {
     [super viewDidLoad];
 	self.dragable = YES;
+    if ([self isIOS8]) {
+        self.view.translatesAutoresizingMaskIntoConstraints = NO;
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -59,6 +62,18 @@
     } else {
         self.dragable = NO;
     }
+}
+
+#pragma mark - Utils
+
+- (BOOL)isIOS8
+{
+    NSComparisonResult order = [[UIDevice currentDevice].systemVersion compare: @"8.0" options: NSNumericSearch];
+    if (order == NSOrderedSame || order == NSOrderedDescending) {
+        // OS version >= 8.0
+        return YES;
+    }
+    return NO;
 }
 
 @end
