@@ -362,13 +362,6 @@
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
 {
     self.isDismiss = YES;
-    
-    if ([self isIOS8]) {
-        // OS version >= 8.0
-        if (self.isInteractive) {
-            return nil;
-        }
-    }
     return self;
 }
 
