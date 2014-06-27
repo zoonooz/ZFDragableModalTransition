@@ -28,8 +28,22 @@
         _dragable = NO;
         _behindViewScale = 0.9f;
         _behindViewAlpha = 1.0f;
+        
+        if (![self isIOS8]) {
+            [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(orientationChanged:)
+                                                     name:UIDeviceOrientationDidChangeNotification
+                                                   object:nil];
+        }
     }
     return self;
+}
+
+-(void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
 
 - (void)setDragable:(BOOL)dragable
@@ -248,8 +262,8 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     CATransform3D transform = CATransform3DMakeScale(
-                                                1 + (((1 / self.behindViewScale) - 1) * percentComplete),
-                                                1 + (((1 / self.behindViewScale) - 1) * percentComplete), 1);
+                                                     1 + (((1 / self.behindViewScale) - 1) * percentComplete),
+                                                     1 + (((1 / self.behindViewScale) - 1) * percentComplete), 1);
     toViewController.view.layer.transform = CATransform3DConcat(self.tempTransform, transform);
     
     toViewController.view.alpha = self.behindViewAlpha + ((1 - self.behindViewAlpha) * percentComplete);
@@ -409,6 +423,50 @@
         return YES;
     }
     return NO;
+}
+
+#pragma mark - Orientation
+
+
+- (void)orientationChanged:(NSNotification *)notification
+{
+    
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (orientation == UIDeviceOrientationPortraitUpsideDown || orientation == UIDeviceOrientationUnknown) {
+        return;
+    }
+    
+    UIViewController *toViewController = self.modalController.presentingViewController;
+    toViewController.view.transform = CGAffineTransformIdentity;
+    [self rotateLayer:toViewController.view.layer];
+    
+}
+
+-(void)rotateLayer: (CALayer *)layer {
+    
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    
+    CGAffineTransform rotate;
+    CGAffineTransform scale = CGAffineTransformMakeScale(self.behindViewScale, self.behindViewScale);
+    
+    switch (orientation) {
+        case UIDeviceOrientationLandscapeLeft:
+            rotate = CGAffineTransformMakeRotation(M_PI_2); // 270 degress
+            
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            rotate = CGAffineTransformMakeRotation(-M_PI_2); // 90 degrees
+            break;
+        default:
+            rotate = CGAffineTransformMakeRotation(0.0);
+            break;
+    }
+    
+    layer.affineTransform = CGAffineTransformConcat(rotate, scale);
+    
+    [layer setBounds:self.modalController.view.bounds];
+    [layer setPosition:CGPointMake(CGRectGetMidX(self.modalController.view.frame),
+                                   CGRectGetMidY(self.modalController.view.frame))];
 }
 
 @end
