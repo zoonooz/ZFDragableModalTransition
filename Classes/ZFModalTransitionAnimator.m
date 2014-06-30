@@ -26,6 +26,7 @@
         _modalController = modalViewController;
         _direction = ZFModalTransitonDirectionBottom;
         _dragable = NO;
+        _bounces = YES;
         _behindViewScale = 0.9f;
         _behindViewAlpha = 1.0f;
         
@@ -257,6 +258,10 @@
 
 - (void)updateInteractiveTransition:(CGFloat)percentComplete
 {
+    if (!self.bounces && percentComplete < 0) {
+        percentComplete = 0;
+    }
+    
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
     
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -430,7 +435,6 @@
 
 - (void)orientationChanged:(NSNotification *)notification
 {
-    
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     if (orientation == UIDeviceOrientationPortraitUpsideDown || orientation == UIDeviceOrientationUnknown) {
         return;
@@ -439,11 +443,10 @@
     UIViewController *toViewController = self.modalController.presentingViewController;
     toViewController.view.transform = CGAffineTransformIdentity;
     [self rotateLayer:toViewController.view.layer];
-    
 }
 
--(void)rotateLayer: (CALayer *)layer {
-    
+-(void)rotateLayer: (CALayer *)layer
+{
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     
     CGAffineTransform rotate;
@@ -451,11 +454,10 @@
     
     switch (orientation) {
         case UIDeviceOrientationLandscapeLeft:
-            rotate = CGAffineTransformMakeRotation(M_PI_2); // 270 degress
-            
+            rotate = CGAffineTransformMakeRotation(M_PI_2);
             break;
         case UIDeviceOrientationLandscapeRight:
-            rotate = CGAffineTransformMakeRotation(-M_PI_2); // 90 degrees
+            rotate = CGAffineTransformMakeRotation(-M_PI_2);
             break;
         default:
             rotate = CGAffineTransformMakeRotation(0.0);
@@ -484,7 +486,8 @@
     self.isFail = nil;
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
     [super touchesMoved:touches withEvent:event];
     
     if (!self.scrollview) {
