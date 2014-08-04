@@ -6,7 +6,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = "ZFDragableModalTransition"
-  s.version          = "0.2"
+  s.version          = "0.3"
   s.summary          = "Custom animation transition for present modal view controller"
   s.homepage         = "https://github.com/zoonooz/ZFDragableModalTransition"
   s.license          = 'MIT'
