@@ -39,6 +39,7 @@
     self.animator.bounces = NO;
     self.animator.behindViewAlpha = 0.5f;
     self.animator.behindViewScale = 0.5f;
+    self.animator.transitionDuration = 0.7f;
     
     NSString *title = [sender titleForState:UIControlStateNormal];
     if ([title isEqualToString:@"Left"]) {

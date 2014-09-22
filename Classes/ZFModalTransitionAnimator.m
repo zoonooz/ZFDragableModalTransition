@@ -29,6 +29,7 @@
         _bounces = YES;
         _behindViewScale = 0.9f;
         _behindViewAlpha = 1.0f;
+        _transitionDuration = 0.8f;
         
         if (![self isIOS8]) {
             [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
@@ -71,7 +72,7 @@
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext
 {
-    return 0.8;
+    return self.transitionDuration;
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext
@@ -114,8 +115,8 @@
         
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
-             usingSpringWithDamping:5
-              initialSpringVelocity:15
+             usingSpringWithDamping:0.8
+              initialSpringVelocity:0.1
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
                              
@@ -165,8 +166,8 @@
         
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
-             usingSpringWithDamping:5
-              initialSpringVelocity:5
+             usingSpringWithDamping:0.8
+              initialSpringVelocity:0.1
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
                              CGFloat scaleBack = (1 / self.behindViewScale);
@@ -328,8 +329,8 @@
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext]
                           delay:0
-         usingSpringWithDamping:5
-          initialSpringVelocity:5
+         usingSpringWithDamping:0.8
+          initialSpringVelocity:0.1
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          CGFloat scaleBack = (1 / self.behindViewScale);
@@ -352,8 +353,8 @@
     
     [UIView animateWithDuration:0.4
                           delay:0
-         usingSpringWithDamping:5
-          initialSpringVelocity:5
+         usingSpringWithDamping:0.8
+          initialSpringVelocity:0.1
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          
