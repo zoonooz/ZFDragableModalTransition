@@ -31,13 +31,11 @@
         _behindViewAlpha = 1.0f;
         _transitionDuration = 0.8f;
         
-        if (![self isIOS8]) {
-            [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-            [[NSNotificationCenter defaultCenter] addObserver:self
+        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+        [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(orientationChanged:)
                                                      name:UIDeviceOrientationDidChangeNotification
                                                    object:nil];
-        }
     }
     return self;
 }
@@ -433,43 +431,9 @@
 
 #pragma mark - Orientation
 
-
 - (void)orientationChanged:(NSNotification *)notification
 {
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    if (orientation == UIDeviceOrientationPortraitUpsideDown || orientation == UIDeviceOrientationUnknown) {
-        return;
-    }
-    
-    UIViewController *toViewController = self.modalController.presentingViewController;
-    toViewController.view.transform = CGAffineTransformIdentity;
-    [self rotateLayer:toViewController.view.layer];
-}
-
--(void)rotateLayer: (CALayer *)layer
-{
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    
-    CGAffineTransform rotate;
-    CGAffineTransform scale = CGAffineTransformMakeScale(self.behindViewScale, self.behindViewScale);
-    
-    switch (orientation) {
-        case UIDeviceOrientationLandscapeLeft:
-            rotate = CGAffineTransformMakeRotation(M_PI_2);
-            break;
-        case UIDeviceOrientationLandscapeRight:
-            rotate = CGAffineTransformMakeRotation(-M_PI_2);
-            break;
-        default:
-            rotate = CGAffineTransformMakeRotation(0.0);
-            break;
-    }
-    
-    layer.affineTransform = CGAffineTransformConcat(rotate, scale);
-    
-    [layer setBounds:self.modalController.view.bounds];
-    [layer setPosition:CGPointMake(CGRectGetMidX(self.modalController.view.frame),
-                                   CGRectGetMidY(self.modalController.view.frame))];
+    self.modalController.presentingViewController.view.bounds = self.modalController.view.window.bounds;
 }
 
 @end
