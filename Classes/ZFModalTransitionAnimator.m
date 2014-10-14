@@ -34,7 +34,7 @@
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(orientationChanged:)
-                                                     name:UIDeviceOrientationDidChangeNotification
+                                                     name:UIApplicationDidChangeStatusBarFrameNotification
                                                    object:nil];
     }
     return self;
@@ -134,7 +134,7 @@
         
         [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
         
-        if (![self isIOS8]) {
+        if (![self isPriorToIOS8]) {
             toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
         }
         
@@ -244,7 +244,7 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
-    if (![self isIOS8]) {
+    if (![self isPriorToIOS8]) {
         toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
     }
     
@@ -419,7 +419,7 @@
 
 #pragma mark - Utils
 
-- (BOOL)isIOS8
+- (BOOL)isPriorToIOS8
 {
     NSComparisonResult order = [[UIDevice currentDevice].systemVersion compare: @"8.0" options: NSNumericSearch];
     if (order == NSOrderedSame || order == NSOrderedDescending) {
@@ -433,7 +433,11 @@
 
 - (void)orientationChanged:(NSNotification *)notification
 {
-    self.modalController.presentingViewController.view.bounds = self.modalController.view.window.bounds;
+    UIViewController *backViewController = self.modalController.presentingViewController;
+    backViewController.view.bounds = backViewController.view.window.bounds;
+    if (![self isPriorToIOS8]) {
+        backViewController.view.layer.transform = CATransform3DScale(backViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+    }
 }
 
 @end
