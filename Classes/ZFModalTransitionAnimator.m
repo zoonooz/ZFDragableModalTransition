@@ -474,9 +474,11 @@
         return;
     }
     
-    if (nowPoint.y > prevPoint.y && self.scrollview.contentOffset.y <= 0) {
+    CGFloat topVerticalOffset = -self.scrollview.contentInset.top;
+    
+    if (nowPoint.y > prevPoint.y && self.scrollview.contentOffset.y <= topVerticalOffset) {
         self.isFail = @NO;
-    } else if (self.scrollview.contentOffset.y >= 0) {
+    } else if (self.scrollview.contentOffset.y >= topVerticalOffset) {
         self.state = UIGestureRecognizerStateFailed;
         self.isFail = @YES;
     } else {
