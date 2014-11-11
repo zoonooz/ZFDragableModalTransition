@@ -111,25 +111,33 @@
         CGPoint transformedPoint = CGPointApplyAffineTransform(startRect.origin, toViewController.view.transform);
         toViewController.view.frame = CGRectMake(transformedPoint.x, transformedPoint.y, startRect.size.width, startRect.size.height);
         
-        [UIView animateWithDuration:[self transitionDuration:transitionContext]
-                              delay:0
-             usingSpringWithDamping:0.8
-              initialSpringVelocity:0.1
-                            options:UIViewAnimationOptionCurveEaseOut
-                         animations:^{
-                             
-                             fromViewController.view.transform = CGAffineTransformScale(fromViewController.view.transform, self.behindViewScale, self.behindViewScale);
-                             fromViewController.view.alpha = self.behindViewAlpha;
-                             
-                             toViewController.view.frame = CGRectMake(0,0,
-                                                                      CGRectGetWidth(toViewController.view.frame),
-                                                                      CGRectGetHeight(toViewController.view.frame));
-                             
-                             
-                         } completion:^(BOOL finished) {
-                             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-                             
-                         }];
+        void (^animations)() = ^{
+            fromViewController.view.transform = CGAffineTransformScale(fromViewController.view.transform, self.behindViewScale, self.behindViewScale);
+            fromViewController.view.alpha = self.behindViewAlpha;
+            
+            toViewController.view.frame = CGRectMake(0,0,
+                                                     CGRectGetWidth(toViewController.view.frame),
+                                                     CGRectGetHeight(toViewController.view.frame));
+        };
+        void (^completion)(BOOL) = ^(BOOL finished){
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+        };
+        
+        if(self.bounces){
+            [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                                  delay:0
+                 usingSpringWithDamping:0.8
+                  initialSpringVelocity:0.1
+                                options:UIViewAnimationOptionCurveEaseOut
+                             animations:animations
+                             completion:completion];
+        } else {
+            [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                                  delay:0.0
+                                options:UIViewAnimationOptionCurveLinear
+                             animations:animations
+                             completion:completion];
+        }
     } else {
         
         [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
@@ -162,20 +170,31 @@
         CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromViewController.view.transform);
         endRect = CGRectMake(transformedPoint.x, transformedPoint.y, endRect.size.width, endRect.size.height);
         
-        [UIView animateWithDuration:[self transitionDuration:transitionContext]
-                              delay:0
-             usingSpringWithDamping:0.8
-              initialSpringVelocity:0.1
-                            options:UIViewAnimationOptionCurveEaseOut
-                         animations:^{
-                             CGFloat scaleBack = (1 / self.behindViewScale);
-                             toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, scaleBack, scaleBack, 1);
-                             toViewController.view.alpha = 1.0f;
-                             fromViewController.view.frame = endRect;
-                         } completion:^(BOOL finished) {
-                             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-                             
-                         }];
+        void (^animations)() = ^{
+            CGFloat scaleBack = (1 / self.behindViewScale);
+            toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, scaleBack, scaleBack, 1);
+            toViewController.view.alpha = 1.0f;
+            fromViewController.view.frame = endRect;
+        };
+        void (^completion)(BOOL) = ^(BOOL finished){
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+        };
+        
+        if(self.bounces){
+            [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                                  delay:0
+                 usingSpringWithDamping:0.8
+                  initialSpringVelocity:0.1
+                                options:UIViewAnimationOptionCurveEaseOut
+                             animations:animations
+                             completion:completion];
+        } else {
+            [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                                  delay:0.0
+                                options:UIViewAnimationOptionCurveLinear
+                             animations:animations
+                             completion:completion];
+        }
     }
 }
 
@@ -325,21 +344,32 @@
     CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromViewController.view.transform);
     endRect = CGRectMake(transformedPoint.x, transformedPoint.y, endRect.size.width, endRect.size.height);
     
-    [UIView animateWithDuration:[self transitionDuration:transitionContext]
-                          delay:0
-         usingSpringWithDamping:0.8
-          initialSpringVelocity:0.1
-                        options:UIViewAnimationOptionCurveEaseOut
-                     animations:^{
-                         CGFloat scaleBack = (1 / self.behindViewScale);
-                         toViewController.view.layer.transform = CATransform3DScale(self.tempTransform, scaleBack, scaleBack, 1);
-                         toViewController.view.alpha = 1.0f;
-                         fromViewController.view.frame = endRect;
-                     } completion:^(BOOL finished) {
-                         [transitionContext completeTransition:YES];
-                         self.modalController = nil;
-                     }];
+    void (^animations)() = ^{
+        CGFloat scaleBack = (1 / self.behindViewScale);
+        toViewController.view.layer.transform = CATransform3DScale(self.tempTransform, scaleBack, scaleBack, 1);
+        toViewController.view.alpha = 1.0f;
+        fromViewController.view.frame = endRect;
+    };
+    void (^completion)(BOOL) = ^(BOOL finished){
+        [transitionContext completeTransition:YES];
+        self.modalController = nil;
+    };
     
+    if(self.bounces){
+        [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                              delay:0
+             usingSpringWithDamping:0.8
+              initialSpringVelocity:0.1
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:animations
+                         completion:completion];
+    } else {
+        [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                              delay:0.0
+                            options:UIViewAnimationOptionCurveLinear
+                         animations:animations
+                         completion:completion];
+    }
 }
 
 - (void)cancelInteractiveTransition
@@ -349,24 +379,33 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
-    [UIView animateWithDuration:0.4
-                          delay:0
-         usingSpringWithDamping:0.8
-          initialSpringVelocity:0.1
-                        options:UIViewAnimationOptionCurveEaseOut
-                     animations:^{
-                         
-                         toViewController.view.layer.transform = self.tempTransform;
-                         toViewController.view.alpha = self.behindViewAlpha;
-                         
-                         fromViewController.view.frame = CGRectMake(0,0,
-                                                                    CGRectGetWidth(fromViewController.view.frame),
-                                                                    CGRectGetHeight(fromViewController.view.frame));
-                         
-                         
-                     } completion:^(BOOL finished) {
-                         [transitionContext completeTransition:NO];
-                     }];
+    void (^animations)() = ^{
+        toViewController.view.layer.transform = self.tempTransform;
+        toViewController.view.alpha = self.behindViewAlpha;
+        
+        fromViewController.view.frame = CGRectMake(0,0,
+                                                   CGRectGetWidth(fromViewController.view.frame),
+                                                   CGRectGetHeight(fromViewController.view.frame));
+    };
+    void (^completion)(BOOL) = ^(BOOL finished){
+        [transitionContext completeTransition:NO];
+    };
+    
+    if(self.bounces){
+        [UIView animateWithDuration:0.4
+                              delay:0
+             usingSpringWithDamping:0.8
+              initialSpringVelocity:0.1
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:animations
+                         completion:completion];
+    } else {
+        [UIView animateWithDuration:0.4
+                              delay:0
+                            options:UIViewAnimationOptionCurveLinear
+                         animations:animations
+                         completion:completion];
+    }
 }
 
 #pragma mark - UIViewControllerTransitioningDelegate Methods
