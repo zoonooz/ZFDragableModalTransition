@@ -10,4 +10,7 @@
 
 @interface ModalViewController : UIViewController
 
+@property (weak, nonatomic) IBOutlet UITextView *scrollView;
+@property bool isScrollable;
+
 @end

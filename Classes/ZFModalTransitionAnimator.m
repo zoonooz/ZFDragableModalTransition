@@ -428,7 +428,7 @@
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
-    if (self.direction == ZFModalTransitonDirectionBottom) {
+    if (self.direction == ZFModalTransitonDirectionBottom || self.direction == ZFModalTransitonDirectionTop) {
         return YES;
     }
     return NO;
@@ -436,7 +436,7 @@
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
-    if (self.direction == ZFModalTransitonDirectionBottom) {
+    if (self.direction == ZFModalTransitonDirectionBottom || self.direction == ZFModalTransitonDirectionTop) {
         return YES;
     }
     return NO;
@@ -487,7 +487,7 @@
     if (!self.scrollview) {
         return;
     }
-    
+
     if (self.state == UIGestureRecognizerStateFailed) return;
     CGPoint nowPoint = [touches.anyObject locationInView:self.view];
     CGPoint prevPoint = [touches.anyObject previousLocationInView:self.view];
@@ -500,8 +500,11 @@
     }
     
     CGFloat topVerticalOffset = -self.scrollview.contentInset.top;
-    
-    if (nowPoint.y > prevPoint.y && self.scrollview.contentOffset.y <= topVerticalOffset) {
+    CGFloat bottomEdge = self.scrollview.contentOffset.y + self.scrollview.frame.size.height;
+
+    if (nowPoint.y < prevPoint.y && bottomEdge >= self.scrollview.contentSize.height) {
+        self.isFail = @NO;
+    } else if (nowPoint.y > prevPoint.y && self.scrollview.contentOffset.y <= topVerticalOffset) {
         self.isFail = @NO;
     } else if (self.scrollview.contentOffset.y >= topVerticalOffset) {
         self.state = UIGestureRecognizerStateFailed;
@@ -509,7 +512,7 @@
     } else {
         self.isFail = @NO;
     }
-    
+
 }
 
 @end
