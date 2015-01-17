@@ -204,17 +204,20 @@
         self.isInteractive = YES;
         if (self.direction == ZFModalTransitonDirectionBottom) {
             self.panLocationStart = location.y;
+        } else if (self.direction == ZFModalTransitonDirectionTop) {
+            self.panLocationStart = location.y;
         } else {
             self.panLocationStart = location.x;
         }
         [self.modalController dismissViewControllerAnimated:YES completion:nil];
     }
-    
     else if (recognizer.state == UIGestureRecognizerStateChanged) {
         CGFloat animationRatio = 0;
         
         if (self.direction == ZFModalTransitonDirectionBottom) {
             animationRatio = (location.y - self.panLocationStart) / (CGRectGetHeight([self.modalController view].bounds));
+        } else if (self.direction == ZFModalTransitonDirectionTop) {
+            animationRatio = (self.panLocationStart - location.y) / (CGRectGetHeight([self.modalController view].bounds));
         } else if (self.direction == ZFModalTransitonDirectionLeft) {
             animationRatio = (self.panLocationStart - location.x) / (CGRectGetWidth([self.modalController view].bounds));
         } else if (self.direction == ZFModalTransitonDirectionRight) {
@@ -228,13 +231,15 @@
         
         if (self.direction == ZFModalTransitonDirectionBottom) {
             velocityForSelectedDirection = velocity.y;
+        } else if (self.direction == ZFModalTransitonDirectionTop) {
+            velocityForSelectedDirection = -velocity.y;
         } else {
             velocityForSelectedDirection = velocity.x;
         }
-        
+
         if (velocityForSelectedDirection > 100
             && (self.direction == ZFModalTransitonDirectionRight
-                || self.direction == ZFModalTransitonDirectionBottom)) {
+                || self.direction == ZFModalTransitonDirectionBottom || self.direction == ZFModalTransitonDirectionTop)) {
                 [self finishInteractiveTransition];
             } else if (velocityForSelectedDirection < -100 && self.direction == ZFModalTransitonDirectionLeft) {
                 [self finishInteractiveTransition];
@@ -288,6 +293,11 @@
                                 (CGRectGetHeight(fromViewController.view.bounds) * percentComplete),
                                 CGRectGetWidth(fromViewController.view.frame),
                                 CGRectGetHeight(fromViewController.view.frame));
+    } else if (self.direction == ZFModalTransitonDirectionTop) {
+        updateRect = CGRectMake(0,
+                                -(CGRectGetHeight(fromViewController.view.bounds) * percentComplete),
+                                CGRectGetWidth(fromViewController.view.frame),
+                                CGRectGetHeight(fromViewController.view.frame));
     } else if (self.direction == ZFModalTransitonDirectionLeft) {
         updateRect = CGRectMake(-(CGRectGetWidth(fromViewController.view.bounds) * percentComplete),
                                 0,
@@ -318,6 +328,11 @@
     if (self.direction == ZFModalTransitonDirectionBottom) {
         endRect = CGRectMake(0,
                              CGRectGetHeight(fromViewController.view.bounds),
+                             CGRectGetWidth(fromViewController.view.frame),
+                             CGRectGetHeight(fromViewController.view.frame));
+    } else if (self.direction == ZFModalTransitonDirectionTop) {
+        endRect = CGRectMake(0,
+                             -CGRectGetHeight(fromViewController.view.bounds),
                              CGRectGetWidth(fromViewController.view.frame),
                              CGRectGetHeight(fromViewController.view.frame));
     } else if (self.direction == ZFModalTransitonDirectionLeft) {
