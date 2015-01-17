@@ -22,7 +22,7 @@
 {
     [super viewDidLoad];
     self.dragable = YES;
-    self.scrollable = YES;
+    self.scrollable = NO;
 }
 
 - (void)didReceiveMemoryWarning
@@ -55,6 +55,8 @@
         self.animator.direction = ZFModalTransitonDirectionRight;
     } else if ([title isEqualToString:@"Top"]) {
         self.animator.direction = ZFModalTransitonDirectionTop;
+    } else if ([title isEqualToString:@"Bottom & Top"]) {
+        self.animator.direction = ZFModalTransitonDirectionBottom|ZFModalTransitonDirectionTop;
     } else {
         self.animator.direction = ZFModalTransitonDirectionBottom;
     }
