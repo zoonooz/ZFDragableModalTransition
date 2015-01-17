@@ -10,6 +10,7 @@
 #import <UIKit/UIGestureRecognizerSubclass.h>
 
 typedef NS_ENUM(NSUInteger, ZFModalTransitonDirection) {
+    ZFModalTransitonDirectionTop,
     ZFModalTransitonDirectionBottom,
     ZFModalTransitonDirectionLeft,
     ZFModalTransitonDirectionRight,

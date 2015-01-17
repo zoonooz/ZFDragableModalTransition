@@ -96,6 +96,11 @@
                                    CGRectGetHeight(toViewController.view.frame),
                                    CGRectGetWidth(toViewController.view.bounds),
                                    CGRectGetHeight(toViewController.view.bounds));
+        } else if (self.direction == ZFModalTransitonDirectionTop) {
+            startRect = CGRectMake(0,
+                                   -CGRectGetHeight(toViewController.view.frame),
+                                   CGRectGetWidth(toViewController.view.bounds),
+                                   CGRectGetHeight(toViewController.view.bounds));
         } else if (self.direction == ZFModalTransitonDirectionLeft) {
             startRect = CGRectMake(-CGRectGetWidth(toViewController.view.frame),
                                    0,
@@ -145,6 +150,11 @@
         if (self.direction == ZFModalTransitonDirectionBottom) {
             endRect = CGRectMake(0,
                                  CGRectGetHeight(fromViewController.view.bounds),
+                                 CGRectGetWidth(fromViewController.view.frame),
+                                 CGRectGetHeight(fromViewController.view.frame));
+        } else if (self.direction == ZFModalTransitonDirectionTop) {
+            endRect = CGRectMake(0,
+                                 -CGRectGetHeight(fromViewController.view.bounds),
                                  CGRectGetWidth(fromViewController.view.frame),
                                  CGRectGetHeight(fromViewController.view.frame));
         } else if (self.direction == ZFModalTransitonDirectionLeft) {

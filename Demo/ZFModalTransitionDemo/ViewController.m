@@ -46,6 +46,8 @@
         self.animator.direction = ZFModalTransitonDirectionLeft;
     } else if ([title isEqualToString:@"Right"]) {
         self.animator.direction = ZFModalTransitonDirectionRight;
+    } else if ([title isEqualToString:@"Top"]) {
+        self.animator.direction = ZFModalTransitonDirectionTop;
     } else {
         self.animator.direction = ZFModalTransitonDirectionBottom;
     }
