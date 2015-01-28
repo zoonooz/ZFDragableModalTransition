@@ -5,13 +5,14 @@
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
 #
 Pod::Spec.new do |s|
-  s.name             = "ZFDragableModalTransition"
+  s.name             = "ZFDragableModalTransition@kennygunie"
   s.version          = "0.4"
-  s.summary          = "Custom animation transition for present modal view controller"
-  s.homepage         = "https://github.com/zoonooz/ZFDragableModalTransition"
+  s.summary          = "fork of kennygunie"
+  s.homepage         = "https://github.com/kennygunie/ZFDragableModalTransition"
   s.license          = 'MIT'
-  s.author           = { "Amornchai Kanokpullwad" => "amornchai.zoon@gmail.com" }
-  s.source           = { :git => "https://github.com/zoonooz/ZFDragableModalTransition.git", :tag => s.version.to_s }
+  s.author           = { "Amornchai Kanokpullwad" => "amornchai.zoon@gmail.com",
+                        "Kien NGUYEN" => "kennygunie@gmail.com" }
+  s.source           = { :git => "https://github.com/kennygunie/ZFDragableModalTransition.git", :tag => s.version.to_s }
 
   s.platform     = :ios, '7.1'
   s.ios.deployment_target = '7.1'
