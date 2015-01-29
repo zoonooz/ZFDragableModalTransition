@@ -290,6 +290,14 @@
                                 CGRectGetHeight(fromViewController.view.frame));
     }
     
+    // reset to zero if x and y has unexpected value to prevent crash
+    if (isnan(updateRect.origin.x) || isinf(updateRect.origin.x)) {
+        updateRect.origin.x = 0;
+    }
+    if (isnan(updateRect.origin.y) || isinf(updateRect.origin.y)) {
+        updateRect.origin.y = 0;
+    }
+    
     CGPoint transformedPoint = CGPointApplyAffineTransform(updateRect.origin, fromViewController.view.transform);
     updateRect = CGRectMake(transformedPoint.x, transformedPoint.y, updateRect.size.width, updateRect.size.height);
     
