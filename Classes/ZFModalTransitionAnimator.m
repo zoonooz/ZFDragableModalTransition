@@ -82,30 +82,31 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     
+    UIView *containerView = [transitionContext containerView];
     
     if (!self.isDismiss) {
         
         CGRect startRect;
         
-        [[transitionContext containerView] addSubview:toViewController.view];
+        [containerView addSubview:toViewController.view];
         
         toViewController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
         
         if (self.direction == ZFModalTransitonDirectionBottom) {
             startRect = CGRectMake(0,
-                                   CGRectGetHeight(toViewController.view.frame),
-                                   CGRectGetWidth(toViewController.view.bounds),
-                                   CGRectGetHeight(toViewController.view.bounds));
+                                   CGRectGetHeight(containerView.frame),
+                                   CGRectGetWidth(containerView.bounds),
+                                   CGRectGetHeight(containerView.bounds));
         } else if (self.direction == ZFModalTransitonDirectionLeft) {
-            startRect = CGRectMake(-CGRectGetWidth(toViewController.view.frame),
+            startRect = CGRectMake(-CGRectGetWidth(containerView.frame),
                                    0,
-                                   CGRectGetWidth(toViewController.view.bounds),
-                                   CGRectGetHeight(toViewController.view.bounds));
+                                   CGRectGetWidth(containerView.bounds),
+                                   CGRectGetHeight(containerView.bounds));
         } else if (self.direction == ZFModalTransitonDirectionRight) {
-            startRect = CGRectMake(CGRectGetWidth(toViewController.view.frame),
+            startRect = CGRectMake(CGRectGetWidth(containerView.frame),
                                    0,
-                                   CGRectGetWidth(toViewController.view.bounds),
-                                   CGRectGetHeight(toViewController.view.bounds));
+                                   CGRectGetWidth(containerView.bounds),
+                                   CGRectGetHeight(containerView.bounds));
         }
         
         CGPoint transformedPoint = CGPointApplyAffineTransform(startRect.origin, toViewController.view.transform);
@@ -132,7 +133,7 @@
                          }];
     } else {
         
-        [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
+        [containerView bringSubviewToFront:fromViewController.view];
         
         if (![self isPriorToIOS8]) {
             toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
