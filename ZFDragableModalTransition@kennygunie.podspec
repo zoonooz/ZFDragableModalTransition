@@ -6,7 +6,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = "ZFDragableModalTransition@kennygunie"
-  s.version          = "0.3"
+  s.version          = "0.4"
   s.summary          = "fork of kennygunie"
   s.homepage         = "https://github.com/kennygunie/ZFDragableModalTransition"
   s.license          = 'MIT'
