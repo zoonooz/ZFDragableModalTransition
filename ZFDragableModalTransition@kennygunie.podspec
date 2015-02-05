@@ -6,7 +6,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = "ZFDragableModalTransition@kennygunie"
-  s.version          = "0.4"
+  s.version          = "0.3"
   s.summary          = "fork of kennygunie"
   s.homepage         = "https://github.com/kennygunie/ZFDragableModalTransition"
   s.license          = 'MIT'
@@ -14,8 +14,8 @@ Pod::Spec.new do |s|
                         "Kien NGUYEN" => "kennygunie@gmail.com" }
   s.source           = { :git => "https://github.com/kennygunie/ZFDragableModalTransition.git", :tag => s.version.to_s }
 
-  s.platform     = :ios, '7.1'
-  s.ios.deployment_target = '7.1'
+  s.platform     = :ios, '7.0'
+  s.ios.deployment_target = '7.0'
   s.requires_arc = true
 
   s.source_files = 'Classes'
