@@ -13,14 +13,14 @@
 {
     TaskDetailViewController *detailViewController = segue.destinationViewController;
     detailViewController.task = sender;
-    
+
     // create animator object with instance of modal view controller
     // we need to keep it in property with strong reference so it will not get release
     self.animator = [[ZFModalTransitionAnimator alloc] initWithModalViewController:detailViewController];
     self.animator.dragable = YES;
     self.animator.direction = ZFModalTransitonDirectionBottom;
     [self.animator setContentScrollView:detailViewController.scrollview];
-    
+
     // set transition delegate of modal view controller to our object
     detailViewController.transitioningDelegate = self.animator;
     detailViewController.modalPresentationStyle = UIModalPresentationCustom;
@@ -47,7 +47,7 @@ ZFModalTransitonDirectionBottom|ZFModalTransitonDirectionTop;
 ```
 
 ## Requirements
-- iOS >= 7.0
+- iOS >= 7.1
 - ARC
 
 ## Installation
@@ -57,11 +57,15 @@ it, simply add the following line to your Podfile:
 
     pod "ZFDragableModalTransition"
 
+## FAQ
+
+### How can I show modal only part of view ?
+The current ViewController's view still visible behind the modal, so you just set transparent color to background view.
+
 ## Author
 
-Amornchai Kanokpullwad, amornchai.zoon@gmail.com
+Amornchai Kanokpullwad, [@zoonref](https://twitter.com/zoonref)
 
 ## License
 
 ZFDragableModalTransition is available under the MIT license. See the LICENSE file for more info.
-
