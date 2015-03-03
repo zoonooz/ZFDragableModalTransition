@@ -26,7 +26,15 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+
+    self.scrollView.hidden = self.isScrollable;
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+
+  self.scrollView.hidden = self.isScrollable;
 }
 
 - (void)didReceiveMemoryWarning

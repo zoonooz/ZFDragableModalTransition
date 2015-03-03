@@ -37,7 +37,14 @@ You can set that which direction will our modal present. (default is ZFModalTran
 ```objc
 self.animator.direction = ZFModalTransitonDirectionBottom;
 ```
-P.S. Now you can set content scrollview only with ZFModalTransitonDirectionBottom
+P.S. Now you can set content scrollview only with ZFModalTransitonDirectionBottom & ZFModalTransitonDirectionBottom
+
+You can now set the direction to be both top and bottom such that you
+can drag to dismiss the modal from either direction
+``` obj
+self.animator.direction =
+ZFModalTransitonDirectionBottom|ZFModalTransitonDirectionTop;
+```
 
 ## Requirements
 - iOS >= 7.1

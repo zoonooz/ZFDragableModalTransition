@@ -10,9 +10,11 @@
 #import <UIKit/UIGestureRecognizerSubclass.h>
 
 typedef NS_ENUM(NSUInteger, ZFModalTransitonDirection) {
-    ZFModalTransitonDirectionBottom,
-    ZFModalTransitonDirectionLeft,
-    ZFModalTransitonDirectionRight,
+    ZFModalTransitonDirectionNone   = 0 << 0,
+    ZFModalTransitonDirectionTop    = 1 << 0,
+    ZFModalTransitonDirectionBottom = 1 << 1,
+    ZFModalTransitonDirectionLeft   = 1 << 2,
+    ZFModalTransitonDirectionRight  = 1 << 3,
 };
 
 @interface ZFDetectScrollViewEndGestureRecognizer : UIPanGestureRecognizer
