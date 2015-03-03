@@ -119,16 +119,6 @@
                                    CGRectGetWidth(toViewController.view.bounds),
                                    CGRectGetHeight(toViewController.view.bounds));
         } else if ([self isCurrentDirection:ZFModalTransitonDirectionRight]) {
-            startRect = CGRectMake(CGRectGetWidth(toViewController.view.frame),
-                                   CGRectGetHeight(containerView.frame),
-                                   CGRectGetWidth(containerView.bounds),
-                                   CGRectGetHeight(containerView.bounds));
-        } else if (self.direction == ZFModalTransitonDirectionLeft) {
-            startRect = CGRectMake(-CGRectGetWidth(containerView.frame),
-                                   0,
-                                   CGRectGetWidth(containerView.bounds),
-                                   CGRectGetHeight(containerView.bounds));
-        } else if (self.direction == ZFModalTransitonDirectionRight) {
             startRect = CGRectMake(CGRectGetWidth(containerView.frame),
                                    0,
                                    CGRectGetWidth(containerView.bounds),
