@@ -113,7 +113,6 @@
         toViewController.view.frame = CGRectMake(transformedPoint.x, transformedPoint.y, startRect.size.width, startRect.size.height);
 
         [fromViewController beginAppearanceTransition:NO animated:YES];
-		    [toViewController beginAppearanceTransition:YES animated:YES];
 
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
@@ -133,7 +132,6 @@
                          } completion:^(BOOL finished) {
 
                              [fromViewController endAppearanceTransition];
-			                       [toViewController endAppearanceTransition];
 
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
 
@@ -169,9 +167,8 @@
 
         CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromViewController.view.transform);
         endRect = CGRectMake(transformedPoint.x, transformedPoint.y, endRect.size.width, endRect.size.height);
-
-        [fromViewController beginAppearanceTransition:NO animated:YES];
-		    [toViewController beginAppearanceTransition:YES animated:YES];
+        
+        [toViewController beginAppearanceTransition:YES animated:YES];
 
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
@@ -185,8 +182,7 @@
                              fromViewController.view.frame = endRect;
                          } completion:^(BOOL finished) {
 
-                             [fromViewController endAppearanceTransition];
-			                       [toViewController endAppearanceTransition];
+			     [toViewController endAppearanceTransition];
 
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
 
