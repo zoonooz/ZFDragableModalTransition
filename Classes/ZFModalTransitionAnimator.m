@@ -167,7 +167,7 @@
 
         CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromViewController.view.transform);
         endRect = CGRectMake(transformedPoint.x, transformedPoint.y, endRect.size.width, endRect.size.height);
-        
+
         [toViewController beginAppearanceTransition:YES animated:YES];
 
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
@@ -255,6 +255,8 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 
+	[toViewController beginAppearanceTransition:YES animated:YES];
+
     if (![self isPriorToIOS8]) {
         toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
     }
@@ -263,7 +265,6 @@
 
     toViewController.view.alpha = self.behindViewAlpha;
     [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
-
 }
 
 - (void)updateInteractiveTransition:(CGFloat)percentComplete
@@ -355,6 +356,9 @@
                          toViewController.view.alpha = 1.0f;
                          fromViewController.view.frame = endRect;
                      } completion:^(BOOL finished) {
+
+						 [toViewController endAppearanceTransition];
+
                          [transitionContext completeTransition:YES];
                          self.modalController = nil;
                      }];
@@ -367,6 +371,8 @@
 
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+
+	[toViewController beginAppearanceTransition:NO animated:YES];
 
     [UIView animateWithDuration:0.4
                           delay:0
@@ -384,6 +390,9 @@
 
 
                      } completion:^(BOOL finished) {
+
+						 [toViewController endAppearanceTransition];
+
                          [transitionContext completeTransition:NO];
                      }];
 }
