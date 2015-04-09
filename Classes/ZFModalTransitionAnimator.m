@@ -8,7 +8,6 @@
 #import "ZFModalTransitionAnimator.h"
 
 @interface ZFModalTransitionAnimator ()
-@property (nonatomic, strong) UIViewController *modalController;
 @property (nonatomic, strong) ZFDetectScrollViewEndGestureRecognizer *gesture;
 @property (nonatomic, strong) id<UIViewControllerContextTransitioning> transitionContext;
 @property CGFloat panLocationStart;
@@ -19,11 +18,10 @@
 
 @implementation ZFModalTransitionAnimator
 
-- (instancetype)initWithModalViewController:(UIViewController *)modalViewController
+- (instancetype)init
 {
     self = [super init];
     if (self) {
-        _modalController = modalViewController;
         _direction = ZFModalTransitonDirectionBottom;
         _dragable = NO;
         _bounces = YES;
@@ -36,6 +34,15 @@
                                                  selector:@selector(orientationChanged:)
                                                      name:UIApplicationDidChangeStatusBarFrameNotification
                                                    object:nil];
+    }
+    return self;
+}
+
+- (id)initWithModalViewController:(UIViewController *)modalViewController
+{
+    self = [self init];
+    if (self) {
+        self.modalController = modalViewController;
     }
     return self;
 }
