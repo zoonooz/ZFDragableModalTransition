@@ -134,7 +134,7 @@
                              [fromViewController endAppearanceTransition];
 
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-
+                             self.modalController = nil;
                          }];
     } else {
 
@@ -182,10 +182,10 @@
                              fromViewController.view.frame = endRect;
                          } completion:^(BOOL finished) {
 
-			     [toViewController endAppearanceTransition];
+                             [toViewController endAppearanceTransition];
 
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-
+                             self.modalController = nil;
                          }];
     }
 }
@@ -255,7 +255,7 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 
-	[toViewController beginAppearanceTransition:YES animated:YES];
+    [toViewController beginAppearanceTransition:YES animated:YES];
 
     if (![self isPriorToIOS8]) {
         toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
@@ -357,12 +357,11 @@
                          fromViewController.view.frame = endRect;
                      } completion:^(BOOL finished) {
 
-						 [toViewController endAppearanceTransition];
+                         [toViewController endAppearanceTransition];
 
                          [transitionContext completeTransition:YES];
                          self.modalController = nil;
                      }];
-
 }
 
 - (void)cancelInteractiveTransition
@@ -372,7 +371,7 @@
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 
-	[toViewController beginAppearanceTransition:NO animated:YES];
+    [toViewController beginAppearanceTransition:NO animated:YES];
 
     [UIView animateWithDuration:0.4
                           delay:0
@@ -391,9 +390,10 @@
 
                      } completion:^(BOOL finished) {
 
-						 [toViewController endAppearanceTransition];
+                         [toViewController endAppearanceTransition];
 
                          [transitionContext completeTransition:NO];
+                         self.modalController = nil;
                      }];
 }
 
