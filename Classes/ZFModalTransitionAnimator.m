@@ -49,19 +49,10 @@
 - (void)setDragable:(BOOL)dragable
 {
     _dragable = dragable;
-    if (_dragable) {
+    if (self.isDragable) {
         self.gesture = [[ZFDetectScrollViewEndGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
         self.gesture.delegate = self;
         [self.modalController.view addGestureRecognizer:self.gesture];
-    }
-    else {
-        // Animator should not be draggable.
-        // When gesture recognizer is set, then revert the previous gesture setup.
-        if (self.gesture) {
-            [self.modalController.view removeGestureRecognizer:self.gesture];
-            self.gesture.delegate = nil;
-            self.gesture = nil;
-        }
     }
 }
 
