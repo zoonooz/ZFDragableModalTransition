@@ -186,11 +186,12 @@
                              toViewController.view.alpha = 1.0f;
                              fromViewController.view.frame = endRect;
                          } completion:^(BOOL finished) {
-
-			     [toViewController endAppearanceTransition];
-
+                             
+                             [toViewController endAppearanceTransition];
+                             
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-
+                             
+                             self.modalController = nil;
                          }];
     }
 }
