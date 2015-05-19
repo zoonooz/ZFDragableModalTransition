@@ -49,10 +49,15 @@
 - (void)setDragable:(BOOL)dragable
 {
     _dragable = dragable;
-    if (self.isDragable) {
+    if (_dragable) {
         self.gesture = [[ZFDetectScrollViewEndGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
         self.gesture.delegate = self;
         [self.modalController.view addGestureRecognizer:self.gesture];
+    } else {
+        if (self.gesture) {
+            [self.modalController.view removeGestureRecognizer:self.gesture];
+            self.gesture = nil;
+        }
     }
 }
 
