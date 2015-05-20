@@ -32,7 +32,7 @@
 - (IBAction)buttonPressed:(UIButton *)sender
 {
     ModalViewController *modalVC = [self.storyboard instantiateViewControllerWithIdentifier:@"ModalViewController"];
-    modalVC.modalPresentationStyle = UIModalPresentationCustom;
+    modalVC.modalPresentationStyle = UIModalPresentationFullScreen;
     
     self.animator = [[ZFModalTransitionAnimator alloc] initWithModalViewController:modalVC];
     self.animator.dragable = self.dragable;
