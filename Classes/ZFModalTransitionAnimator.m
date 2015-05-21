@@ -8,7 +8,7 @@
 #import "ZFModalTransitionAnimator.h"
 
 @interface ZFModalTransitionAnimator ()
-@property (nonatomic, strong) UIViewController *modalController;
+@property (nonatomic, weak) UIViewController *modalController;
 @property (nonatomic, strong) ZFDetectScrollViewEndGestureRecognizer *gesture;
 @property (nonatomic, strong) id<UIViewControllerContextTransitioning> transitionContext;
 @property CGFloat panLocationStart;
@@ -125,21 +125,15 @@
               initialSpringVelocity:0.1
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
-
                              fromViewController.view.transform = CGAffineTransformScale(fromViewController.view.transform, self.behindViewScale, self.behindViewScale);
                              fromViewController.view.alpha = self.behindViewAlpha;
 
                              toViewController.view.frame = CGRectMake(0,0,
                                                                       CGRectGetWidth(toViewController.view.frame),
                                                                       CGRectGetHeight(toViewController.view.frame));
-
-
                          } completion:^(BOOL finished) {
-
                              [fromViewController endAppearanceTransition];
-
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-
                          }];
     } else {
 
@@ -186,11 +180,8 @@
                              toViewController.view.alpha = 1.0f;
                              fromViewController.view.frame = endRect;
                          } completion:^(BOOL finished) {
-
-			     [toViewController endAppearanceTransition];
-
+                             [toViewController endAppearanceTransition];
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-
                          }];
     }
 }
@@ -214,9 +205,8 @@
             self.panLocationStart = location.x;
         }
         [self.modalController dismissViewControllerAnimated:YES completion:nil];
-    }
-
-    else if (recognizer.state == UIGestureRecognizerStateChanged) {
+        
+    } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         CGFloat animationRatio = 0;
 
         if (self.direction == ZFModalTransitonDirectionBottom) {
@@ -228,6 +218,7 @@
         }
 
         [self updateInteractiveTransition:animationRatio];
+        
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
 
         CGFloat velocityForSelectedDirection;
@@ -361,13 +352,9 @@
                          toViewController.view.alpha = 1.0f;
                          fromViewController.view.frame = endRect;
                      } completion:^(BOOL finished) {
-
 						 [toViewController endAppearanceTransition];
-
                          [transitionContext completeTransition:YES];
-                         self.modalController = nil;
                      }];
-
 }
 
 - (void)cancelInteractiveTransition
@@ -385,19 +372,14 @@
           initialSpringVelocity:0.1
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
-
                          toViewController.view.layer.transform = self.tempTransform;
                          toViewController.view.alpha = self.behindViewAlpha;
 
                          fromViewController.view.frame = CGRectMake(0,0,
                                                                     CGRectGetWidth(fromViewController.view.frame),
                                                                     CGRectGetHeight(fromViewController.view.frame));
-
-
                      } completion:^(BOOL finished) {
-
 						 [toViewController endAppearanceTransition];
-
                          [transitionContext completeTransition:NO];
                      }];
 }
@@ -517,7 +499,6 @@
     } else {
         self.isFail = @NO;
     }
-
 }
 
 @end
