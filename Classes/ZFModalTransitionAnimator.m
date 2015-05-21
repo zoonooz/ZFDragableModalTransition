@@ -429,6 +429,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
 						 [toViewController endAppearanceTransition];
 
                          [transitionContext completeTransition:NO];
+                         [toView removeFromSuperview];
                      }];
 }
 
