@@ -17,6 +17,23 @@
 @property CATransform3D tempTransform;
 @end
 
+void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> transitionContext, UIView **fromView, UIView **toView)
+{
+    UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+    UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+
+    if ([transitionContext respondsToSelector:@selector(viewForKey:)])
+    {
+        *fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
+        *toView = [transitionContext viewForKey:UITransitionContextToViewKey];
+    }
+    else
+    {
+        *fromView = fromViewController.view;
+        *toView = toViewController.view;
+    }
+}
+
 @implementation ZFModalTransitionAnimator
 
 - (instancetype)initWithModalViewController:(UIViewController *)modalViewController
@@ -83,19 +100,22 @@
     if (self.isInteractive) {
         return;
     }
-    // Grab the from and to view controllers from the context
+
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 
+    UIView *fromView, *toView;
+    ZFTransitionViewsFromContext(transitionContext, &fromView, &toView);
+    
     UIView *containerView = [transitionContext containerView];
 
     if (!self.isDismiss) {
 
         CGRect startRect;
 
-        [containerView addSubview:toViewController.view];
+        [containerView addSubview:toView];
 
-        toViewController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+        toView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 
         if (self.direction == ZFModalTransitonDirectionBottom) {
             startRect = CGRectMake(0,
@@ -114,8 +134,8 @@
                                    CGRectGetHeight(containerView.bounds));
         }
 
-        CGPoint transformedPoint = CGPointApplyAffineTransform(startRect.origin, toViewController.view.transform);
-        toViewController.view.frame = CGRectMake(transformedPoint.x, transformedPoint.y, startRect.size.width, startRect.size.height);
+        CGPoint transformedPoint = CGPointApplyAffineTransform(startRect.origin, toView.transform);
+        toView.frame = CGRectMake(transformedPoint.x, transformedPoint.y, startRect.size.width, startRect.size.height);
 
         [fromViewController beginAppearanceTransition:NO animated:YES];
 
@@ -125,46 +145,49 @@
               initialSpringVelocity:0.1
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
-                             fromViewController.view.transform = CGAffineTransformScale(fromViewController.view.transform, self.behindViewScale, self.behindViewScale);
-                             fromViewController.view.alpha = self.behindViewAlpha;
 
-                             toViewController.view.frame = CGRectMake(0,0,
-                                                                      CGRectGetWidth(toViewController.view.frame),
-                                                                      CGRectGetHeight(toViewController.view.frame));
+                             fromView.transform = CGAffineTransformScale(fromView.transform, self.behindViewScale, self.behindViewScale);
+                             fromView.alpha = self.behindViewAlpha;
+
+                             toView.frame = CGRectMake(0,0,
+                                                                      CGRectGetWidth(toView.frame),
+                                                                      CGRectGetHeight(toView.frame));
+
                          } completion:^(BOOL finished) {
                              [fromViewController endAppearanceTransition];
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
                          }];
     } else {
 
-        [containerView bringSubviewToFront:fromViewController.view];
+        [containerView addSubview:toView];
+        [containerView bringSubviewToFront:fromView];
 
         if (![self isPriorToIOS8]) {
-            toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+            toView.layer.transform = CATransform3DScale(toView.layer.transform, self.behindViewScale, self.behindViewScale, 1);
         }
 
-        toViewController.view.alpha = self.behindViewAlpha;
+        toView.alpha = self.behindViewAlpha;
 
         CGRect endRect;
 
         if (self.direction == ZFModalTransitonDirectionBottom) {
             endRect = CGRectMake(0,
-                                 CGRectGetHeight(fromViewController.view.bounds),
-                                 CGRectGetWidth(fromViewController.view.frame),
-                                 CGRectGetHeight(fromViewController.view.frame));
+                                 CGRectGetHeight(fromView.bounds),
+                                 CGRectGetWidth(fromView.frame),
+                                 CGRectGetHeight(fromView.frame));
         } else if (self.direction == ZFModalTransitonDirectionLeft) {
-            endRect = CGRectMake(-CGRectGetWidth(fromViewController.view.bounds),
+            endRect = CGRectMake(-CGRectGetWidth(fromView.bounds),
                                  0,
-                                 CGRectGetWidth(fromViewController.view.frame),
-                                 CGRectGetHeight(fromViewController.view.frame));
+                                 CGRectGetWidth(fromView.frame),
+                                 CGRectGetHeight(fromView.frame));
         } else if (self.direction == ZFModalTransitonDirectionRight) {
-            endRect = CGRectMake(CGRectGetWidth(fromViewController.view.bounds),
+            endRect = CGRectMake(CGRectGetWidth(fromView.bounds),
                                  0,
-                                 CGRectGetWidth(fromViewController.view.frame),
-                                 CGRectGetHeight(fromViewController.view.frame));
+                                 CGRectGetWidth(fromView.frame),
+                                 CGRectGetHeight(fromView.frame));
         }
 
-        CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromViewController.view.transform);
+        CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromView.transform);
         endRect = CGRectMake(transformedPoint.x, transformedPoint.y, endRect.size.width, endRect.size.height);
 
         [toViewController beginAppearanceTransition:YES animated:YES];
@@ -176,12 +199,15 @@
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
                              CGFloat scaleBack = (1 / self.behindViewScale);
-                             toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, scaleBack, scaleBack, 1);
-                             toViewController.view.alpha = 1.0f;
-                             fromViewController.view.frame = endRect;
+                             toView.layer.transform = CATransform3DScale(toView.layer.transform, scaleBack, scaleBack, 1);
+                             toView.alpha = 1.0f;
+                             fromView.frame = endRect;
                          } completion:^(BOOL finished) {
+                             
                              [toViewController endAppearanceTransition];
+                             
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+
                          }];
     }
 }
@@ -248,19 +274,22 @@
 {
     self.transitionContext = transitionContext;
 
-    UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 
+    UIView *fromView, *toView;
+    ZFTransitionViewsFromContext(transitionContext, &fromView, &toView);
+    
 	[toViewController beginAppearanceTransition:YES animated:YES];
 
     if (![self isPriorToIOS8]) {
-        toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+        toView.layer.transform = CATransform3DScale(toView.layer.transform, self.behindViewScale, self.behindViewScale, 1);
     }
 
-    self.tempTransform = toViewController.view.layer.transform;
+    self.tempTransform = toView.layer.transform;
 
-    toViewController.view.alpha = self.behindViewAlpha;
-    [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
+    toView.alpha = self.behindViewAlpha;
+    [[transitionContext containerView] addSubview:toView];
+    [[transitionContext containerView] bringSubviewToFront:fromView];
 }
 
 - (void)updateInteractiveTransition:(CGFloat)percentComplete
@@ -271,31 +300,32 @@
 
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
 
-    UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+    UIView *fromView, *toView;
+    ZFTransitionViewsFromContext(transitionContext, &fromView, &toView);
+    
     CATransform3D transform = CATransform3DMakeScale(
                                                      1 + (((1 / self.behindViewScale) - 1) * percentComplete),
                                                      1 + (((1 / self.behindViewScale) - 1) * percentComplete), 1);
-    toViewController.view.layer.transform = CATransform3DConcat(self.tempTransform, transform);
+    toView.layer.transform = CATransform3DConcat(self.tempTransform, transform);
 
-    toViewController.view.alpha = self.behindViewAlpha + ((1 - self.behindViewAlpha) * percentComplete);
+    toView.alpha = self.behindViewAlpha + ((1 - self.behindViewAlpha) * percentComplete);
 
     CGRect updateRect;
     if (self.direction == ZFModalTransitonDirectionBottom) {
         updateRect = CGRectMake(0,
-                                (CGRectGetHeight(fromViewController.view.bounds) * percentComplete),
-                                CGRectGetWidth(fromViewController.view.frame),
-                                CGRectGetHeight(fromViewController.view.frame));
+                                (CGRectGetHeight(fromView.bounds) * percentComplete),
+                                CGRectGetWidth(fromView.frame),
+                                CGRectGetHeight(fromView.frame));
     } else if (self.direction == ZFModalTransitonDirectionLeft) {
-        updateRect = CGRectMake(-(CGRectGetWidth(fromViewController.view.bounds) * percentComplete),
+        updateRect = CGRectMake(-(CGRectGetWidth(fromView.bounds) * percentComplete),
                                 0,
-                                CGRectGetWidth(fromViewController.view.frame),
-                                CGRectGetHeight(fromViewController.view.frame));
+                                CGRectGetWidth(fromView.frame),
+                                CGRectGetHeight(fromView.frame));
     } else if (self.direction == ZFModalTransitonDirectionRight) {
-        updateRect = CGRectMake(CGRectGetWidth(fromViewController.view.bounds) * percentComplete,
+        updateRect = CGRectMake(CGRectGetWidth(fromView.bounds) * percentComplete,
                                 0,
-                                CGRectGetWidth(fromViewController.view.frame),
-                                CGRectGetHeight(fromViewController.view.frame));
+                                CGRectGetWidth(fromView.frame),
+                                CGRectGetHeight(fromView.frame));
     }
 
     // reset to zero if x and y has unexpected value to prevent crash
@@ -306,39 +336,41 @@
         updateRect.origin.y = 0;
     }
 
-    CGPoint transformedPoint = CGPointApplyAffineTransform(updateRect.origin, fromViewController.view.transform);
+    CGPoint transformedPoint = CGPointApplyAffineTransform(updateRect.origin, fromView.transform);
     updateRect = CGRectMake(transformedPoint.x, transformedPoint.y, updateRect.size.width, updateRect.size.height);
 
-    fromViewController.view.frame = updateRect;
+    fromView.frame = updateRect;
 }
 
 - (void)finishInteractiveTransition
 {
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
 
-    UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+
+    UIView *fromView, *toView;
+    ZFTransitionViewsFromContext(transitionContext, &fromView, &toView);
 
     CGRect endRect;
 
     if (self.direction == ZFModalTransitonDirectionBottom) {
         endRect = CGRectMake(0,
-                             CGRectGetHeight(fromViewController.view.bounds),
-                             CGRectGetWidth(fromViewController.view.frame),
-                             CGRectGetHeight(fromViewController.view.frame));
+                             CGRectGetHeight(fromView.bounds),
+                             CGRectGetWidth(fromView.frame),
+                             CGRectGetHeight(fromView.frame));
     } else if (self.direction == ZFModalTransitonDirectionLeft) {
-        endRect = CGRectMake(-CGRectGetWidth(fromViewController.view.bounds),
+        endRect = CGRectMake(-CGRectGetWidth(fromView.bounds),
                              0,
-                             CGRectGetWidth(fromViewController.view.frame),
-                             CGRectGetHeight(fromViewController.view.frame));
+                             CGRectGetWidth(fromView.frame),
+                             CGRectGetHeight(fromView.frame));
     } else if (self.direction == ZFModalTransitonDirectionRight) {
-        endRect = CGRectMake(CGRectGetWidth(fromViewController.view.bounds),
+        endRect = CGRectMake(CGRectGetWidth(fromView.bounds),
                              0,
-                             CGRectGetWidth(fromViewController.view.frame),
-                             CGRectGetHeight(fromViewController.view.frame));
+                             CGRectGetWidth(fromView.frame),
+                             CGRectGetHeight(fromView.frame));
     }
 
-    CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromViewController.view.transform);
+    CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromView.transform);
     endRect = CGRectMake(transformedPoint.x, transformedPoint.y, endRect.size.width, endRect.size.height);
 
     [UIView animateWithDuration:[self transitionDuration:transitionContext]
@@ -348,9 +380,9 @@
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
                          CGFloat scaleBack = (1 / self.behindViewScale);
-                         toViewController.view.layer.transform = CATransform3DScale(self.tempTransform, scaleBack, scaleBack, 1);
-                         toViewController.view.alpha = 1.0f;
-                         fromViewController.view.frame = endRect;
+                         toView.layer.transform = CATransform3DScale(self.tempTransform, scaleBack, scaleBack, 1);
+                         toView.alpha = 1.0f;
+                         fromView.frame = endRect;
                      } completion:^(BOOL finished) {
 						 [toViewController endAppearanceTransition];
                          [transitionContext completeTransition:YES];
@@ -361,10 +393,12 @@
 {
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
 
-    UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 
-	[toViewController beginAppearanceTransition:NO animated:YES];
+    UIView *fromView, *toView;
+    ZFTransitionViewsFromContext(transitionContext, &fromView, &toView);
+
+    [toViewController beginAppearanceTransition:NO animated:YES];
 
     [UIView animateWithDuration:0.4
                           delay:0
@@ -372,15 +406,18 @@
           initialSpringVelocity:0.1
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
-                         toViewController.view.layer.transform = self.tempTransform;
-                         toViewController.view.alpha = self.behindViewAlpha;
 
-                         fromViewController.view.frame = CGRectMake(0,0,
-                                                                    CGRectGetWidth(fromViewController.view.frame),
-                                                                    CGRectGetHeight(fromViewController.view.frame));
+                         toView.layer.transform = self.tempTransform;
+                         toView.alpha = self.behindViewAlpha;
+
+                         fromView.frame = CGRectMake(0,0,
+                                                                    CGRectGetWidth(fromView.frame),
+                                                                    CGRectGetHeight(fromView.frame));
+
                      } completion:^(BOOL finished) {
 						 [toViewController endAppearanceTransition];
                          [transitionContext completeTransition:NO];
+                         [toView removeFromSuperview];
                      }];
 }
 
