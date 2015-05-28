@@ -1,5 +1,13 @@
 # ZFDragableModalTransition CHANGELOG
 
+## 0.5.1
+
+- fix animator strongly reference to modal view controller
+
+## 0.5.0
+
+- added neccessary appearance methods call for view controller
+
 ## 0.4.0
 
 - fix sometimes layout mess when rotate, wrong scale in iOS7

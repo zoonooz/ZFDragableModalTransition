@@ -8,7 +8,7 @@
 #import "ZFModalTransitionAnimator.h"
 
 @interface ZFModalTransitionAnimator ()
-@property (nonatomic, strong) UIViewController *modalController;
+@property (nonatomic, weak) UIViewController *modalController;
 @property (nonatomic, strong) ZFDetectScrollViewEndGestureRecognizer *gesture;
 @property (nonatomic, strong) id<UIViewControllerContextTransitioning> transitionContext;
 @property CGFloat panLocationStart;
@@ -153,13 +153,9 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                                                                       CGRectGetWidth(toView.frame),
                                                                       CGRectGetHeight(toView.frame));
 
-
                          } completion:^(BOOL finished) {
-
                              [fromViewController endAppearanceTransition];
-
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-
                          }];
     } else {
 
@@ -211,8 +207,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                              [toViewController endAppearanceTransition];
                              
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-                             
-                             self.modalController = nil;
+
                          }];
     }
 }
@@ -236,9 +231,8 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
             self.panLocationStart = location.x;
         }
         [self.modalController dismissViewControllerAnimated:YES completion:nil];
-    }
-
-    else if (recognizer.state == UIGestureRecognizerStateChanged) {
+        
+    } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         CGFloat animationRatio = 0;
 
         if (self.direction == ZFModalTransitonDirectionBottom) {
@@ -250,6 +244,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
         }
 
         [self updateInteractiveTransition:animationRatio];
+        
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
 
         CGFloat velocityForSelectedDirection;
@@ -389,13 +384,9 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                          toView.alpha = 1.0f;
                          fromView.frame = endRect;
                      } completion:^(BOOL finished) {
-
 						 [toViewController endAppearanceTransition];
-
                          [transitionContext completeTransition:YES];
-                         self.modalController = nil;
                      }];
-
 }
 
 - (void)cancelInteractiveTransition
@@ -423,11 +414,8 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                                                                     CGRectGetWidth(fromView.frame),
                                                                     CGRectGetHeight(fromView.frame));
 
-
                      } completion:^(BOOL finished) {
-
 						 [toViewController endAppearanceTransition];
-
                          [transitionContext completeTransition:NO];
                          [toView removeFromSuperview];
                      }];
@@ -548,7 +536,6 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
     } else {
         self.isFail = @NO;
     }
-
 }
 
 @end
