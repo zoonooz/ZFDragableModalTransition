@@ -40,7 +40,7 @@
     return self;
 }
 
--(void)dealloc
+- (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
@@ -137,6 +137,10 @@
                          }];
     } else {
 
+        if (fromViewController.modalPresentationStyle == UIModalPresentationFullScreen) {
+            [containerView addSubview:toViewController.view];
+        }
+        
         [containerView bringSubviewToFront:fromViewController.view];
 
         if (![self isPriorToIOS8]) {
@@ -260,6 +264,10 @@
     self.tempTransform = toViewController.view.layer.transform;
 
     toViewController.view.alpha = self.behindViewAlpha;
+    
+    if (fromViewController.modalPresentationStyle == UIModalPresentationFullScreen) {
+        [[transitionContext containerView] addSubview:toViewController.view];
+    }
     [[transitionContext containerView] bringSubviewToFront:fromViewController.view];
 }
 
@@ -381,6 +389,10 @@
                      } completion:^(BOOL finished) {
 						 [toViewController endAppearanceTransition];
                          [transitionContext completeTransition:NO];
+                         
+                         if (fromViewController.modalPresentationStyle == UIModalPresentationFullScreen) {
+                             [toViewController.view removeFromSuperview];
+                         }
                      }];
 }
 

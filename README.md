@@ -23,6 +23,8 @@
 
     // set transition delegate of modal view controller to our object
     detailViewController.transitioningDelegate = self.animator;
+
+    // if you modal cover all behind view controller, use UIModalPresentationFullScreen
     detailViewController.modalPresentationStyle = UIModalPresentationCustom;
 }
 ```
