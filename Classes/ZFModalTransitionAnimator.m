@@ -117,7 +117,9 @@
         CGPoint transformedPoint = CGPointApplyAffineTransform(startRect.origin, toViewController.view.transform);
         toViewController.view.frame = CGRectMake(transformedPoint.x, transformedPoint.y, startRect.size.width, startRect.size.height);
 
-        [fromViewController beginAppearanceTransition:NO animated:YES];
+        if (toViewController.modalPresentationStyle == UIModalPresentationCustom) {
+            [fromViewController beginAppearanceTransition:NO animated:YES];
+        }
 
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
@@ -132,7 +134,9 @@
                                                                       CGRectGetWidth(toViewController.view.frame),
                                                                       CGRectGetHeight(toViewController.view.frame));
                          } completion:^(BOOL finished) {
-                             [fromViewController endAppearanceTransition];
+                             if (toViewController.modalPresentationStyle == UIModalPresentationCustom) {
+                                 [fromViewController endAppearanceTransition];
+                             }
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
                          }];
     } else {
@@ -171,7 +175,9 @@
         CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromViewController.view.transform);
         endRect = CGRectMake(transformedPoint.x, transformedPoint.y, endRect.size.width, endRect.size.height);
 
-        [toViewController beginAppearanceTransition:YES animated:YES];
+        if (fromViewController.modalPresentationStyle == UIModalPresentationCustom) {
+            [toViewController beginAppearanceTransition:YES animated:YES];
+        }
 
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
@@ -184,7 +190,9 @@
                              toViewController.view.alpha = 1.0f;
                              fromViewController.view.frame = endRect;
                          } completion:^(BOOL finished) {
-                             [toViewController endAppearanceTransition];
+                             if (fromViewController.modalPresentationStyle == UIModalPresentationCustom) {
+                                 [toViewController endAppearanceTransition];
+                             }
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
                          }];
     }
@@ -254,8 +262,6 @@
 
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-
-	[toViewController beginAppearanceTransition:YES animated:YES];
 
     if (![self isPriorToIOS8]) {
         toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
@@ -349,6 +355,10 @@
     CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromViewController.view.transform);
     endRect = CGRectMake(transformedPoint.x, transformedPoint.y, endRect.size.width, endRect.size.height);
 
+    if (fromViewController.modalPresentationStyle == UIModalPresentationCustom) {
+        [toViewController beginAppearanceTransition:YES animated:YES];
+    }
+    
     [UIView animateWithDuration:[self transitionDuration:transitionContext]
                           delay:0
          usingSpringWithDamping:0.8
@@ -360,7 +370,9 @@
                          toViewController.view.alpha = 1.0f;
                          fromViewController.view.frame = endRect;
                      } completion:^(BOOL finished) {
-						 [toViewController endAppearanceTransition];
+                         if (fromViewController.modalPresentationStyle == UIModalPresentationCustom) {
+                             [toViewController endAppearanceTransition];
+                         }
                          [transitionContext completeTransition:YES];
                      }];
 }
@@ -371,8 +383,6 @@
 
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-
-	[toViewController beginAppearanceTransition:NO animated:YES];
 
     [UIView animateWithDuration:0.4
                           delay:0
@@ -387,9 +397,7 @@
                                                                     CGRectGetWidth(fromViewController.view.frame),
                                                                     CGRectGetHeight(fromViewController.view.frame));
                      } completion:^(BOOL finished) {
-						 [toViewController endAppearanceTransition];
                          [transitionContext completeTransition:NO];
-                         
                          if (fromViewController.modalPresentationStyle == UIModalPresentationFullScreen) {
                              [toViewController.view removeFromSuperview];
                          }
