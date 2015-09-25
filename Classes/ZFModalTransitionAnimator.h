@@ -23,6 +23,7 @@ typedef NS_ENUM(NSUInteger, ZFModalTransitonDirection) {
 
 @property (nonatomic, assign, getter=isDragable) BOOL dragable;
 @property (nonatomic, readonly) ZFDetectScrollViewEndGestureRecognizer *gesture;
+@property (nonatomic, assign) UIGestureRecognizer *gestureRecognizerToFailPan;
 @property BOOL bounces;
 @property ZFModalTransitonDirection direction;
 @property CGFloat behindViewScale;
