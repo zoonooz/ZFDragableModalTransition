@@ -469,10 +469,9 @@
 - (void)orientationChanged:(NSNotification *)notification
 {
     UIViewController *backViewController = self.modalController.presentingViewController;
-    backViewController.view.bounds = backViewController.view.window.bounds;
-    if (![self isPriorToIOS8]) {
-        backViewController.view.layer.transform = CATransform3DScale(backViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
-    }
+    backViewController.view.transform = CGAffineTransformIdentity;
+    backViewController.view.frame = self.modalController.view.bounds;
+    backViewController.view.transform = CGAffineTransformScale(backViewController.view.transform, self.behindViewScale, self.behindViewScale);
 }
 
 @end
