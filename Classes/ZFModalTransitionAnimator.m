@@ -50,14 +50,12 @@
 {
     _dragable = dragable;
     if (_dragable) {
+        [self removeGestureRecognizerFromModalController];
         self.gesture = [[ZFDetectScrollViewEndGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
         self.gesture.delegate = self;
         [self.modalController.view addGestureRecognizer:self.gesture];
     } else {
-        if (self.gesture) {
-            [self.modalController.view removeGestureRecognizer:self.gesture];
-            self.gesture = nil;
-        }
+        [self removeGestureRecognizerFromModalController];
     }
 }
 
@@ -195,6 +193,14 @@
                              }
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
                          }];
+    }
+}
+
+- (void)removeGestureRecognizerFromModalController
+{
+    if (self.gesture && [self.modalController.view.gestureRecognizers containsObject:self.gesture]) {
+        [self.modalController.view removeGestureRecognizer:self.gesture];
+        self.gesture = nil;
     }
 }
 
