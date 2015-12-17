@@ -50,14 +50,12 @@
 {
     _dragable = dragable;
     if (_dragable) {
+        [self removeGestureRecognizerFromModalController];
         self.gesture = [[ZFDetectScrollViewEndGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
         self.gesture.delegate = self;
         [self.modalController.view addGestureRecognizer:self.gesture];
     } else {
-        if (self.gesture) {
-            [self.modalController.view removeGestureRecognizer:self.gesture];
-            self.gesture = nil;
-        }
+        [self removeGestureRecognizerFromModalController];
     }
 }
 
@@ -195,6 +193,14 @@
                              }
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
                          }];
+    }
+}
+
+- (void)removeGestureRecognizerFromModalController
+{
+    if (self.gesture && [self.modalController.view.gestureRecognizers containsObject:self.gesture]) {
+        [self.modalController.view removeGestureRecognizer:self.gesture];
+        self.gesture = nil;
     }
 }
 
@@ -452,6 +458,14 @@
     return NO;
 }
 
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    if (self.gestureRecognizerToFailPan == otherGestureRecognizer) {
+        return YES;
+    }
+    
+    return NO;
+}
+
 #pragma mark - Utils
 
 - (BOOL)isPriorToIOS8
@@ -498,6 +512,7 @@
     }
 
     if (self.state == UIGestureRecognizerStateFailed) return;
+    CGPoint velocity = [self velocityInView:self.view];
     CGPoint nowPoint = [touches.anyObject locationInView:self.view];
     CGPoint prevPoint = [touches.anyObject previousLocationInView:self.view];
 
@@ -510,7 +525,7 @@
 
     CGFloat topVerticalOffset = -self.scrollview.contentInset.top;
 
-    if (nowPoint.y > prevPoint.y && self.scrollview.contentOffset.y <= topVerticalOffset) {
+    if ((fabs(velocity.x) < fabs(velocity.y)) && (nowPoint.y > prevPoint.y) && (self.scrollview.contentOffset.y <= topVerticalOffset)) {
         self.isFail = @NO;
     } else if (self.scrollview.contentOffset.y >= topVerticalOffset) {
         self.state = UIGestureRecognizerStateFailed;
