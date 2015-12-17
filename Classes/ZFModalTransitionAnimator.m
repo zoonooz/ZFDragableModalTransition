@@ -61,7 +61,22 @@
 
 - (void)setContentScrollView:(UIScrollView *)scrollView
 {
+    // always enable drag if scrollview is set
+    if (!self.dragable) {
+        self.dragable = YES;
+    }
+    // and scrollview will work only for bottom mode
+    self.direction = ZFModalTransitonDirectionBottom;
     self.gesture.scrollview = scrollView;
+}
+
+- (void)setDirection:(ZFModalTransitonDirection)direction
+{
+    _direction = direction;
+    // scrollview will work only for bottom mode
+    if (_direction != ZFModalTransitonDirectionBottom) {
+        self.gesture.scrollview = nil;
+    }
 }
 
 - (void)animationEnded:(BOOL)transitionCompleted

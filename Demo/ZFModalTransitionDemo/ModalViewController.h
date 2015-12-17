@@ -10,4 +10,7 @@
 
 @interface ModalViewController : UIViewController
 
+@property (nonatomic, weak) IBOutlet UIScrollView *scrollView;
+@property BOOL isShowingScrollView;
+
 @end

@@ -11,7 +11,8 @@
 #import "ZFModalTransitionAnimator.h"
 
 @interface ViewController ()
-@property BOOL dragable;
+@property (weak, nonatomic) IBOutlet UISwitch *dragableSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *scrollViewSwitch;
 @property (nonatomic, strong) ZFModalTransitionAnimator *animator;
 @end
 
@@ -20,7 +21,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	self.dragable = YES;
 }
 
 - (void)didReceiveMemoryWarning
@@ -32,14 +32,19 @@
 - (IBAction)buttonPressed:(UIButton *)sender
 {
     ModalViewController *modalVC = [self.storyboard instantiateViewControllerWithIdentifier:@"ModalViewController"];
+    modalVC.isShowingScrollView = self.scrollViewSwitch.isOn;
     modalVC.modalPresentationStyle = UIModalPresentationFullScreen;
     
     self.animator = [[ZFModalTransitionAnimator alloc] initWithModalViewController:modalVC];
-    self.animator.dragable = self.dragable;
+    self.animator.dragable = self.dragableSwitch.isOn;
     self.animator.bounces = NO;
     self.animator.behindViewAlpha = 0.5f;
     self.animator.behindViewScale = 0.5f;
     self.animator.transitionDuration = 0.7f;
+    
+    if (self.scrollViewSwitch.isOn) {
+        [self.animator setContentScrollView:modalVC.scrollView];
+    }
     
     NSString *title = [sender titleForState:UIControlStateNormal];
     if ([title isEqualToString:@"Left"]) {
@@ -52,20 +57,6 @@
     
     modalVC.transitioningDelegate = self.animator;
     [self presentViewController:modalVC animated:YES completion:nil];
-}
-
-- (IBAction)dragableChanged:(UISwitch *)sender
-{
-    if (sender.on) {
-        self.dragable = YES;
-    } else {
-        self.dragable = NO;
-    }
-}
-
-- (NSUInteger)supportedInterfaceOrientations
-{
-    return UIInterfaceOrientationMaskAll;
 }
 
 @end
