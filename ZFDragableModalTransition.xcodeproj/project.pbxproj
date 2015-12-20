@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		455343A21C27441F0013DD4D /* ZFDragableModalTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 455343A11C27441F0013DD4D /* ZFDragableModalTransition.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		455343AB1C2744850013DD4D /* ZFModalTransitionAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 455343A91C2744850013DD4D /* ZFModalTransitionAnimator.h */; };
+		455343AB1C2744850013DD4D /* ZFModalTransitionAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 455343A91C2744850013DD4D /* ZFModalTransitionAnimator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		455343AC1C2744850013DD4D /* ZFModalTransitionAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = 455343AA1C2744850013DD4D /* ZFModalTransitionAnimator.m */; };
 /* End PBXBuildFile section */
 

@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4553439D1C27441F0013DD4D"
-               BuildableName = "ZFDragableModalTransition-iOS.framework"
+               BuildableName = "ZFDragableModalTransition.framework"
                BlueprintName = "ZFDragableModalTransition-iOS"
                ReferencedContainer = "container:ZFDragableModalTransition.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4553439D1C27441F0013DD4D"
-            BuildableName = "ZFDragableModalTransition-iOS.framework"
+            BuildableName = "ZFDragableModalTransition.framework"
             BlueprintName = "ZFDragableModalTransition-iOS"
             ReferencedContainer = "container:ZFDragableModalTransition.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4553439D1C27441F0013DD4D"
-            BuildableName = "ZFDragableModalTransition-iOS.framework"
+            BuildableName = "ZFDragableModalTransition.framework"
             BlueprintName = "ZFDragableModalTransition-iOS"
             ReferencedContainer = "container:ZFDragableModalTransition.xcodeproj">
          </BuildableReference>
