@@ -203,6 +203,7 @@
                              toViewController.view.alpha = 1.0f;
                              fromViewController.view.frame = endRect;
                          } completion:^(BOOL finished) {
+                             toViewController.view.layer.transform = CATransform3DIdentity;
                              if (fromViewController.modalPresentationStyle == UIModalPresentationCustom) {
                                  [toViewController endAppearanceTransition];
                              }
