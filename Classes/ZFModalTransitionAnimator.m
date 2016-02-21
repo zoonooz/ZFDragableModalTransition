@@ -402,7 +402,8 @@
 - (void)cancelInteractiveTransition
 {
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
-
+    [transitionContext cancelInteractiveTransition];
+    
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 
