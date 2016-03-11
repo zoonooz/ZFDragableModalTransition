@@ -54,6 +54,9 @@ it, simply add the following line to your Podfile:
 
 Amornchai Kanokpullwad, amornchai.zoon@gmail.com
 
+##  Swift Version [ZFDragableModalTransitionSwift](https://github.com/dimohamdy/ZFDragableModalTransitionSwift)
+
+
 ## License
 
 ZFDragableModalTransition is available under the MIT license. See the LICENSE file for more info.
