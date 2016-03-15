@@ -61,6 +61,9 @@ The current ViewController's view still visible behind the modal, so you just se
 
 Amornchai Kanokpullwad, [@zoonref](https://twitter.com/zoonref)
 
+##  Swift Version [ZFDragableModalTransitionSwift](https://github.com/dimohamdy/ZFDragableModalTransitionSwift)
+
+
 ## License
 
 ZFDragableModalTransition is available under the MIT license. See the LICENSE file for more info.
