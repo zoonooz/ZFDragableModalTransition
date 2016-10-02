@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		DC15A4F2193F710800D293CE /* ModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC15A4F1193F710800D293CE /* ModalViewController.m */; };
+		DC81DC6B1DA0E84E00B94A5B /* ZFModalTransitionAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = DC81DC6A1DA0E84E00B94A5B /* ZFModalTransitionAnimator.m */; };
 		DCAD9954193F6E7300F0F385 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCAD9953193F6E7300F0F385 /* Foundation.framework */; };
 		DCAD9956193F6E7300F0F385 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCAD9955193F6E7300F0F385 /* CoreGraphics.framework */; };
 		DCAD9958193F6E7300F0F385 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCAD9957193F6E7300F0F385 /* UIKit.framework */; };
@@ -22,7 +23,6 @@
 		DCAD9975193F6E7300F0F385 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCAD9957193F6E7300F0F385 /* UIKit.framework */; };
 		DCAD997D193F6E7300F0F385 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DCAD997B193F6E7300F0F385 /* InfoPlist.strings */; };
 		DCAD997F193F6E7300F0F385 /* ZFModalTransitionDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAD997E193F6E7300F0F385 /* ZFModalTransitionDemoTests.m */; };
-		DCAD998C193F6EEF00F0F385 /* ZFModalTransitionAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAD998B193F6EEF00F0F385 /* ZFModalTransitionAnimator.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +38,8 @@
 /* Begin PBXFileReference section */
 		DC15A4F0193F710800D293CE /* ModalViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalViewController.h; sourceTree = "<group>"; };
 		DC15A4F1193F710800D293CE /* ModalViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalViewController.m; sourceTree = "<group>"; };
+		DC81DC691DA0E84E00B94A5B /* ZFModalTransitionAnimator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZFModalTransitionAnimator.h; path = ../../ZFDragableModalTransition/ZFModalTransitionAnimator.h; sourceTree = "<group>"; };
+		DC81DC6A1DA0E84E00B94A5B /* ZFModalTransitionAnimator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZFModalTransitionAnimator.m; path = ../../ZFDragableModalTransition/ZFModalTransitionAnimator.m; sourceTree = "<group>"; };
 		DCAD9950193F6E7300F0F385 /* ZFModalTransitionDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZFModalTransitionDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCAD9953193F6E7300F0F385 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		DCAD9955193F6E7300F0F385 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -57,8 +59,6 @@
 		DCAD997A193F6E7300F0F385 /* ZFModalTransitionDemoTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ZFModalTransitionDemoTests-Info.plist"; sourceTree = "<group>"; };
 		DCAD997C193F6E7300F0F385 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DCAD997E193F6E7300F0F385 /* ZFModalTransitionDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZFModalTransitionDemoTests.m; sourceTree = "<group>"; };
-		DCAD998A193F6EEF00F0F385 /* ZFModalTransitionAnimator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZFModalTransitionAnimator.h; sourceTree = "<group>"; };
-		DCAD998B193F6EEF00F0F385 /* ZFModalTransitionAnimator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZFModalTransitionAnimator.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +85,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DC81DC681DA0E82F00B94A5B /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				DC81DC691DA0E84E00B94A5B /* ZFModalTransitionAnimator.h */,
+				DC81DC6A1DA0E84E00B94A5B /* ZFModalTransitionAnimator.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
 		DCAD9947193F6E7200F0F385 = {
 			isa = PBXGroup;
 			children = (
@@ -118,7 +127,7 @@
 		DCAD9959193F6E7300F0F385 /* ZFModalTransitionDemo */ = {
 			isa = PBXGroup;
 			children = (
-				DCAD9989193F6EEF00F0F385 /* Classes */,
+				DC81DC681DA0E82F00B94A5B /* Classes */,
 				DCAD9962193F6E7300F0F385 /* AppDelegate.h */,
 				DCAD9963193F6E7300F0F385 /* AppDelegate.m */,
 				DCAD9965193F6E7300F0F385 /* Main.storyboard */,
@@ -159,16 +168,6 @@
 				DCAD997B193F6E7300F0F385 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		DCAD9989193F6EEF00F0F385 /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				DCAD998A193F6EEF00F0F385 /* ZFModalTransitionAnimator.h */,
-				DCAD998B193F6EEF00F0F385 /* ZFModalTransitionAnimator.m */,
-			);
-			name = Classes;
-			path = ../../Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -269,10 +268,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCAD996A193F6E7300F0F385 /* ViewController.m in Sources */,
-				DCAD998C193F6EEF00F0F385 /* ZFModalTransitionAnimator.m in Sources */,
 				DC15A4F2193F710800D293CE /* ModalViewController.m in Sources */,
 				DCAD9964193F6E7300F0F385 /* AppDelegate.m in Sources */,
 				DCAD9960193F6E7300F0F385 /* main.m in Sources */,
+				DC81DC6B1DA0E84E00B94A5B /* ZFModalTransitionAnimator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
