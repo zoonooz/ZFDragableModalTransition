@@ -20,4 +20,4 @@ profile
 xcuserdata/
 project.xcworkspace/
 
-xcshareddata/
+Carthage/
