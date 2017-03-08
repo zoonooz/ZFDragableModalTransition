@@ -529,7 +529,6 @@
     }
 
     if (self.state == UIGestureRecognizerStateFailed) return;
-    CGPoint velocity = [self velocityInView:self.view];
     CGPoint nowPoint = [touches.anyObject locationInView:self.view];
     CGPoint prevPoint = [touches.anyObject previousLocationInView:self.view];
 
@@ -542,7 +541,7 @@
 
     CGFloat topVerticalOffset = -self.scrollview.contentInset.top;
 
-    if ((fabs(velocity.x) < fabs(velocity.y)) && (nowPoint.y > prevPoint.y) && (self.scrollview.contentOffset.y <= topVerticalOffset)) {
+    if ((nowPoint.y > prevPoint.y) && (self.scrollview.contentOffset.y <= topVerticalOffset)) {
         self.isFail = @NO;
     } else if (self.scrollview.contentOffset.y >= topVerticalOffset) {
         self.state = UIGestureRecognizerStateFailed;
