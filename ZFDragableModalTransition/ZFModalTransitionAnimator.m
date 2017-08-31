@@ -501,7 +501,9 @@
 {
     UIViewController *backViewController = self.modalController.presentingViewController;
     backViewController.view.transform = CGAffineTransformIdentity;
-    backViewController.view.frame = self.modalController.view.bounds;
+    CGRect bounds = self.modalController.view.bounds;
+    bounds.origin = CGPointZero;
+    backViewController.view.frame = bounds;
     backViewController.view.transform = CGAffineTransformScale(backViewController.view.transform, self.behindViewScale, self.behindViewScale);
 }
 
