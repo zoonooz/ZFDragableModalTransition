@@ -381,29 +381,40 @@
         [toViewController beginAppearanceTransition:YES animated:YES];
     }
     
-    [UIView animateWithDuration:[self transitionDuration:transitionContext]
-                          delay:0
-         usingSpringWithDamping:0.8
-          initialSpringVelocity:0.1
-                        options:UIViewAnimationOptionCurveEaseOut
-                     animations:^{
-                         CGFloat scaleBack = (1 / self.behindViewScale);
-                         toViewController.view.layer.transform = CATransform3DScale(self.tempTransform, scaleBack, scaleBack, 1);
-                         toViewController.view.alpha = 1.0f;
-                         fromViewController.view.frame = endRect;
-                     } completion:^(BOOL finished) {
-                         if (fromViewController.modalPresentationStyle == UIModalPresentationCustom) {
-                             [toViewController endAppearanceTransition];
-                         }
-                         [transitionContext completeTransition:YES];
-                     }];
+    void (^animations)() = ^{
+        CGFloat scaleBack = (1 / self.behindViewScale);
+        toViewController.view.layer.transform = CATransform3DScale(self.tempTransform, scaleBack, scaleBack, 1);
+        fromViewController.view.alpha = 1.0f;
+        fromViewController.view.frame = endRect;
+    };
+    void (^completion)(BOOL) = ^(BOOL finished){
+        if (toViewController.modalPresentationStyle == UIModalPresentationCustom) {
+            [fromViewController endAppearanceTransition];
+        }
+        [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+    };
+    
+    if(self.bounces){
+        [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                              delay:0
+             usingSpringWithDamping:0.8
+              initialSpringVelocity:0.1
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:animations
+                         completion:completion];
+    } else {
+        [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                              delay:0.0
+                            options:UIViewAnimationOptionCurveLinear
+                         animations:animations
+                         completion:completion];
+    }
 }
 
 - (void)cancelInteractiveTransition
 {
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
-    [transitionContext cancelInteractiveTransition];
-    
+
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 
