@@ -244,7 +244,10 @@
         CGFloat animationRatio = 0;
 
         if (self.direction == ZFModalTransitonDirectionBottom) {
-            animationRatio = (location.y - self.panLocationStart) / (CGRectGetHeight([self.modalController view].bounds));
+            CGFloat moveYDrection = location.y - self.panLocationStart;
+            if (moveYDrection > 0) {
+                animationRatio = (moveYDrection) / (CGRectGetHeight([self.modalController view].bounds));
+            }
         } else if (self.direction == ZFModalTransitonDirectionLeft) {
             animationRatio = (self.panLocationStart - location.x) / (CGRectGetWidth([self.modalController view].bounds));
         } else if (self.direction == ZFModalTransitonDirectionRight) {
