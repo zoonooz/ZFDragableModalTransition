@@ -552,6 +552,11 @@
     }
 
     CGFloat topVerticalOffset = -self.scrollview.contentInset.top;
+    if ([self.scrollview respondsToSelector:@selector(safeAreaInsets)]) {
+        if (@available(iOS 11.0, *)) {
+            topVerticalOffset -= self.scrollview.safeAreaInsets.top;
+        }
+    }
 
     if ((fabs(velocity.x) < fabs(velocity.y)) && (nowPoint.y > prevPoint.y) && (self.scrollview.contentOffset.y <= topVerticalOffset)) {
         self.isFail = @NO;
