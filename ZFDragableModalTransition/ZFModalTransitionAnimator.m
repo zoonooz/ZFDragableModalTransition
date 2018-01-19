@@ -31,6 +31,8 @@
         _behindViewScale = 0.9f;
         _behindViewAlpha = 1.0f;
         _transitionDuration = 0.8f;
+        _dismissVelocity = 100.0f;
+        _dismissDistance = 100.0f;
 
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -286,24 +288,26 @@
         [self updateInteractiveTransition:animationRatio];
         
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
-
         CGFloat velocityForSelectedDirection;
-
+        CGFloat distanceOnSelectedDirection;
         if (self.direction == ZFModalTransitonDirectionBottom) {
             velocityForSelectedDirection = velocity.y;
+            distanceOnSelectedDirection = location.y - self.panLocationStart;
         } else {
-            velocityForSelectedDirection = velocity.x;
+            if (self.direction == ZFModalTransitonDirectionLeft) {
+                velocityForSelectedDirection = -velocity.x;
+                distanceOnSelectedDirection = self.panLocationStart - location.x;
+            } else if (self.direction == ZFModalTransitonDirectionRight) {
+                velocityForSelectedDirection = velocity.x;
+                distanceOnSelectedDirection = location.x - self.panLocationStart;
+            }
         }
 
-        if (velocityForSelectedDirection > 100
-            && (self.direction == ZFModalTransitonDirectionRight
-                || self.direction == ZFModalTransitonDirectionBottom)) {
-                [self finishInteractiveTransition];
-            } else if (velocityForSelectedDirection < -100 && self.direction == ZFModalTransitonDirectionLeft) {
-                [self finishInteractiveTransition];
-            } else {
-                [self cancelInteractiveTransition];
-            }
+        if (velocityForSelectedDirection > _dismissVelocity || distanceOnSelectedDirection > _dismissDistance) {
+            [self finishInteractiveTransition];
+        } else {
+            [self cancelInteractiveTransition];
+        }
         self.isInteractive = NO;
     }
 }
