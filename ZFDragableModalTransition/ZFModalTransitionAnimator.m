@@ -12,6 +12,7 @@
 @property (nonatomic, strong) ZFDetectScrollViewEndGestureRecognizer *gesture;
 @property (nonatomic, strong) id<UIViewControllerContextTransitioning> transitionContext;
 @property CGFloat panLocationStart;
+@property CGFloat scrollViewOffsetStart;
 @property BOOL isDismiss;
 @property BOOL isInteractive;
 @property CATransform3D tempTransform;
@@ -235,6 +236,7 @@
         self.isInteractive = YES;
         if (self.direction == ZFModalTransitonDirectionBottom) {
             self.panLocationStart = location.y;
+            self.scrollViewOffsetStart = self.gesture.scrollview.contentOffset.y;
         } else {
             self.panLocationStart = location.x;
         }
@@ -244,9 +246,12 @@
         CGFloat animationRatio = 0;
 
         if (self.direction == ZFModalTransitonDirectionBottom) {
-            CGFloat moveYDrection = location.y - self.panLocationStart;
-            if (moveYDrection > 0) {
-                animationRatio = (moveYDrection) / (CGRectGetHeight([self.modalController view].bounds));
+            CGFloat yOffset = location.y - self.panLocationStart;
+            BOOL isMovingDown = yOffset > 0;
+            if (isMovingDown) {
+                animationRatio = (yOffset) / (CGRectGetHeight([self.modalController view].bounds));
+            } else {
+                self.gesture.scrollview.contentOffset = CGPointMake(self.gesture.scrollview.contentOffset.x, self.scrollViewOffsetStart - yOffset);
             }
         } else if (self.direction == ZFModalTransitonDirectionLeft) {
             animationRatio = (self.panLocationStart - location.x) / (CGRectGetWidth([self.modalController view].bounds));
@@ -542,7 +547,9 @@
         return;
     }
 
-    if (self.state == UIGestureRecognizerStateFailed) return;
+    if (self.state == UIGestureRecognizerStateFailed) {
+        return;
+    }
     CGPoint velocity = [self velocityInView:self.view];
     CGPoint nowPoint = [touches.anyObject locationInView:self.view];
     CGPoint prevPoint = [touches.anyObject previousLocationInView:self.view];
@@ -554,18 +561,8 @@
         return;
     }
 
-    CGFloat topVerticalOffset = -self.scrollview.contentInset.top;
-    if ([self.scrollview respondsToSelector:@selector(safeAreaInsets)]) {
-        if (@available(iOS 11.0, *)) {
-            topVerticalOffset -= self.scrollview.safeAreaInsets.top;
-        }
-    }
-
-    if ((fabs(velocity.x) < fabs(velocity.y)) && (nowPoint.y > prevPoint.y) && (self.scrollview.contentOffset.y <= topVerticalOffset)) {
+    if ((fabs(velocity.x) < fabs(velocity.y)) && (nowPoint.y > prevPoint.y)) {
         self.isFail = @NO;
-    } else if (self.scrollview.contentOffset.y >= topVerticalOffset) {
-        self.state = UIGestureRecognizerStateFailed;
-        self.isFail = @YES;
     } else {
         self.isFail = @NO;
     }
