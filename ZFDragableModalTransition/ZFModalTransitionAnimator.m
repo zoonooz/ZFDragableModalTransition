@@ -12,6 +12,7 @@
 @property (nonatomic, strong) ZFDetectScrollViewEndGestureRecognizer *gesture;
 @property (nonatomic, strong) id<UIViewControllerContextTransitioning> transitionContext;
 @property CGFloat panLocationStart;
+@property CGFloat scrollViewOffsetStart;
 @property BOOL isDismiss;
 @property BOOL isInteractive;
 @property CATransform3D tempTransform;
@@ -30,6 +31,8 @@
         _behindViewScale = 0.9f;
         _behindViewAlpha = 1.0f;
         _transitionDuration = 0.8f;
+        _dismissVelocity = 100.0f;
+        _dismissDistance = 100.0f;
 
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -133,25 +136,37 @@
         if (toViewController.modalPresentationStyle == UIModalPresentationCustom) {
             [fromViewController beginAppearanceTransition:NO animated:YES];
         }
-
-        [UIView animateWithDuration:[self transitionDuration:transitionContext]
-                              delay:0
-             usingSpringWithDamping:0.8
-              initialSpringVelocity:0.1
-                            options:UIViewAnimationOptionCurveEaseOut
-                         animations:^{
-                             fromViewController.view.transform = CGAffineTransformScale(fromViewController.view.transform, self.behindViewScale, self.behindViewScale);
-                             fromViewController.view.alpha = self.behindViewAlpha;
-
-                             toViewController.view.frame = CGRectMake(0,0,
-                                                                      CGRectGetWidth(toViewController.view.frame),
-                                                                      CGRectGetHeight(toViewController.view.frame));
-                         } completion:^(BOOL finished) {
-                             if (toViewController.modalPresentationStyle == UIModalPresentationCustom) {
-                                 [fromViewController endAppearanceTransition];
-                             }
-                             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-                         }];
+        
+        void (^animations)() = ^{
+            fromViewController.view.transform = CGAffineTransformScale(fromViewController.view.transform, self.behindViewScale, self.behindViewScale);
+            fromViewController.view.alpha = self.behindViewAlpha;
+            
+            toViewController.view.frame = CGRectMake(0,0,
+                                                     CGRectGetWidth(toViewController.view.frame),
+                                                     CGRectGetHeight(toViewController.view.frame));
+        };
+        void (^completion)(BOOL) = ^(BOOL finished){
+            if (toViewController.modalPresentationStyle == UIModalPresentationCustom) {
+                [fromViewController endAppearanceTransition];
+            }
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+        };
+        
+        if(self.bounces){
+            [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                                  delay:0
+                 usingSpringWithDamping:0.8
+                  initialSpringVelocity:0.1
+                                options:UIViewAnimationOptionCurveEaseOut
+                             animations:animations
+                             completion:completion];
+        } else {
+            [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                                  delay:0.0
+                                options:UIViewAnimationOptionCurveEaseOut
+                             animations:animations
+                             completion:completion];
+        }
     } else {
 
         if (fromViewController.modalPresentationStyle == UIModalPresentationFullScreen) {
@@ -192,23 +207,35 @@
             [toViewController beginAppearanceTransition:YES animated:YES];
         }
 
-        [UIView animateWithDuration:[self transitionDuration:transitionContext]
-                              delay:0
-             usingSpringWithDamping:0.8
-              initialSpringVelocity:0.1
-                            options:UIViewAnimationOptionCurveEaseOut
-                         animations:^{
-                             CGFloat scaleBack = (1 / self.behindViewScale);
-                             toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, scaleBack, scaleBack, 1);
-                             toViewController.view.alpha = 1.0f;
-                             fromViewController.view.frame = endRect;
-                         } completion:^(BOOL finished) {
-                             toViewController.view.layer.transform = CATransform3DIdentity;
-                             if (fromViewController.modalPresentationStyle == UIModalPresentationCustom) {
-                                 [toViewController endAppearanceTransition];
-                             }
-                             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-                         }];
+        void (^animations)() = ^{
+            CGFloat scaleBack = (1 / self.behindViewScale);
+            toViewController.view.layer.transform = CATransform3DScale(toViewController.view.layer.transform, scaleBack, scaleBack, 1);
+            toViewController.view.alpha = 1.0f;
+            fromViewController.view.frame = endRect;
+        };
+        void (^completion)(BOOL) = ^(BOOL finished){
+            toViewController.view.layer.transform = CATransform3DIdentity;
+            if (fromViewController.modalPresentationStyle == UIModalPresentationCustom) {
+                [toViewController endAppearanceTransition];
+            }
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+        };
+        
+        if(self.bounces){
+            [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                                  delay:0
+                 usingSpringWithDamping:0.8
+                  initialSpringVelocity:0.1
+                                options:UIViewAnimationOptionCurveEaseOut
+                             animations:animations
+                             completion:completion];
+        } else {
+            [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                                  delay:0.0
+                                options:UIViewAnimationOptionCurveEaseOut
+                             animations:animations
+                             completion:completion];
+        }
     }
 }
 
@@ -235,6 +262,7 @@
         self.isInteractive = YES;
         if (self.direction == ZFModalTransitonDirectionBottom) {
             self.panLocationStart = location.y;
+            self.scrollViewOffsetStart = self.gesture.scrollview.contentOffset.y;
         } else {
             self.panLocationStart = location.x;
         }
@@ -244,7 +272,13 @@
         CGFloat animationRatio = 0;
 
         if (self.direction == ZFModalTransitonDirectionBottom) {
-            animationRatio = (location.y - self.panLocationStart) / (CGRectGetHeight([self.modalController view].bounds));
+            CGFloat yOffset = location.y - self.panLocationStart;
+            BOOL isMovingDown = yOffset > 0;
+            if (isMovingDown) {
+                animationRatio = (yOffset) / (CGRectGetHeight([self.modalController view].bounds));
+            } else {
+                self.gesture.scrollview.contentOffset = CGPointMake(self.gesture.scrollview.contentOffset.x, self.scrollViewOffsetStart - yOffset);
+            }
         } else if (self.direction == ZFModalTransitonDirectionLeft) {
             animationRatio = (self.panLocationStart - location.x) / (CGRectGetWidth([self.modalController view].bounds));
         } else if (self.direction == ZFModalTransitonDirectionRight) {
@@ -254,24 +288,26 @@
         [self updateInteractiveTransition:animationRatio];
         
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
-
         CGFloat velocityForSelectedDirection;
-
+        CGFloat distanceOnSelectedDirection;
         if (self.direction == ZFModalTransitonDirectionBottom) {
             velocityForSelectedDirection = velocity.y;
+            distanceOnSelectedDirection = location.y - self.panLocationStart;
         } else {
-            velocityForSelectedDirection = velocity.x;
+            if (self.direction == ZFModalTransitonDirectionLeft) {
+                velocityForSelectedDirection = -velocity.x;
+                distanceOnSelectedDirection = self.panLocationStart - location.x;
+            } else if (self.direction == ZFModalTransitonDirectionRight) {
+                velocityForSelectedDirection = velocity.x;
+                distanceOnSelectedDirection = location.x - self.panLocationStart;
+            }
         }
 
-        if (velocityForSelectedDirection > 100
-            && (self.direction == ZFModalTransitonDirectionRight
-                || self.direction == ZFModalTransitonDirectionBottom)) {
-                [self finishInteractiveTransition];
-            } else if (velocityForSelectedDirection < -100 && self.direction == ZFModalTransitonDirectionLeft) {
-                [self finishInteractiveTransition];
-            } else {
-                [self cancelInteractiveTransition];
-            }
+        if (velocityForSelectedDirection > _dismissVelocity || distanceOnSelectedDirection > _dismissDistance) {
+            [self finishInteractiveTransition];
+        } else {
+            [self cancelInteractiveTransition];
+        }
         self.isInteractive = NO;
     }
 }
@@ -381,50 +417,73 @@
         [toViewController beginAppearanceTransition:YES animated:YES];
     }
     
-    [UIView animateWithDuration:[self transitionDuration:transitionContext]
-                          delay:0
-         usingSpringWithDamping:0.8
-          initialSpringVelocity:0.1
-                        options:UIViewAnimationOptionCurveEaseOut
-                     animations:^{
-                         CGFloat scaleBack = (1 / self.behindViewScale);
-                         toViewController.view.layer.transform = CATransform3DScale(self.tempTransform, scaleBack, scaleBack, 1);
-                         toViewController.view.alpha = 1.0f;
-                         fromViewController.view.frame = endRect;
-                     } completion:^(BOOL finished) {
-                         if (fromViewController.modalPresentationStyle == UIModalPresentationCustom) {
-                             [toViewController endAppearanceTransition];
-                         }
-                         [transitionContext completeTransition:YES];
-                     }];
+    void (^animations)() = ^{
+        CGFloat scaleBack = (1 / self.behindViewScale);
+        toViewController.view.layer.transform = CATransform3DScale(self.tempTransform, scaleBack, scaleBack, 1);
+        fromViewController.view.alpha = 1.0f;
+        fromViewController.view.frame = endRect;
+    };
+    void (^completion)(BOOL) = ^(BOOL finished){
+        if (toViewController.modalPresentationStyle == UIModalPresentationCustom) {
+            [fromViewController endAppearanceTransition];
+        }
+        [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+    };
+    
+    if(self.bounces){
+        [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                              delay:0
+             usingSpringWithDamping:0.8
+              initialSpringVelocity:0.1
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:animations
+                         completion:completion];
+    } else {
+        [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                              delay:0.0
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:animations
+                         completion:completion];
+    }
 }
 
 - (void)cancelInteractiveTransition
 {
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
-    [transitionContext cancelInteractiveTransition];
-    
+
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
 
-    [UIView animateWithDuration:0.4
-                          delay:0
-         usingSpringWithDamping:0.8
-          initialSpringVelocity:0.1
-                        options:UIViewAnimationOptionCurveEaseOut
-                     animations:^{
-                         toViewController.view.layer.transform = self.tempTransform;
-                         toViewController.view.alpha = self.behindViewAlpha;
-
-                         fromViewController.view.frame = CGRectMake(0,0,
-                                                                    CGRectGetWidth(fromViewController.view.frame),
-                                                                    CGRectGetHeight(fromViewController.view.frame));
-                     } completion:^(BOOL finished) {
-                         [transitionContext completeTransition:NO];
-                         if (fromViewController.modalPresentationStyle == UIModalPresentationFullScreen) {
-                             [toViewController.view removeFromSuperview];
-                         }
-                     }];
+    void (^animations)() = ^{
+        toViewController.view.layer.transform = self.tempTransform;
+        toViewController.view.alpha = self.behindViewAlpha;
+        
+        fromViewController.view.frame = CGRectMake(0,0,
+                                                   CGRectGetWidth(fromViewController.view.frame),
+                                                   CGRectGetHeight(fromViewController.view.frame));
+    };
+    void (^completion)(BOOL) = ^(BOOL finished){
+        [transitionContext completeTransition:NO];
+        if (fromViewController.modalPresentationStyle == UIModalPresentationFullScreen) {
+            [toViewController.view removeFromSuperview];
+        }
+    };
+    
+    if(self.bounces){
+        [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                              delay:0
+             usingSpringWithDamping:0.8
+              initialSpringVelocity:0.1
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:animations
+                         completion:completion];
+    } else {
+        [UIView animateWithDuration:[self transitionDuration:transitionContext]
+                              delay:0.0
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:animations
+                         completion:completion];
+    }
 }
 
 #pragma mark - UIViewControllerTransitioningDelegate Methods
@@ -458,6 +517,14 @@
 }
 
 #pragma mark - Gesture Delegate
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    if (self.delegate) {
+        return [self.delegate modalTransitionAnimatorShouldBegin:self];
+    }
+    return YES;
+}
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
@@ -528,7 +595,9 @@
         return;
     }
 
-    if (self.state == UIGestureRecognizerStateFailed) return;
+    if (self.state == UIGestureRecognizerStateFailed) {
+        return;
+    }
     CGPoint velocity = [self velocityInView:self.view];
     CGPoint nowPoint = [touches.anyObject locationInView:self.view];
     CGPoint prevPoint = [touches.anyObject previousLocationInView:self.view];
@@ -540,13 +609,8 @@
         return;
     }
 
-    CGFloat topVerticalOffset = -self.scrollview.contentInset.top;
-
-    if ((fabs(velocity.x) < fabs(velocity.y)) && (nowPoint.y > prevPoint.y) && (self.scrollview.contentOffset.y <= topVerticalOffset)) {
+    if ((fabs(velocity.x) < fabs(velocity.y)) && (nowPoint.y > prevPoint.y)) {
         self.isFail = @NO;
-    } else if (self.scrollview.contentOffset.y >= topVerticalOffset) {
-        self.state = UIGestureRecognizerStateFailed;
-        self.isFail = @YES;
     } else {
         self.isFail = @NO;
     }
