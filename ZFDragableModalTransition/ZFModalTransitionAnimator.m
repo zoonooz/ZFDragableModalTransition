@@ -518,6 +518,14 @@
 
 #pragma mark - Gesture Delegate
 
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    if (self.delegate) {
+        return [self.delegate modalTransitionAnimatorShouldBegin:self];
+    }
+    return YES;
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     if (self.direction == ZFModalTransitonDirectionBottom) {
